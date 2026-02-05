@@ -1,0 +1,165 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/petcom/nextjs_space/node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pets         Pet[]
+  orders       Order[]
+  preferences  UserPreferences?
+
+  @@map("users")
+}
+
+model Pet {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  type      String   // dog, cat, bird, fish, rodent, reptile
+  breed     String?
+  age       Int?
+  weight    Float?
+  photoUrl  String?
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("pets")
+  @@index([userId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id                   String   @id @default(cuid())
+  name                 String
+  description          String   @db.Text
+  price                Float
+  imageUrl             String
+  categoryId           String
+  petTypes             String[] // Array of pet types: ["dog", "cat"]
+  stock                Int      @default(0)
+  featured             Boolean  @default(false)
+  tags                 String[] @default([])
+  recommendationReason String?  @db.Text
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  category   Category    @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("products")
+  @@index([categoryId])
+  @@index([featured])
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  userId          String
+  status          String   @default("pending") // pending, processing, shipped, delivered, cancelled
+  total           Float
+  subtotal        Float
+  discount        Float    @default(0)
+  shippingAddress String?  @db.Text
+  couponCode      String?
+  stripePaymentId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+
+  @@map("orders")
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+  @@index([orderId])
+}
+
+model Coupon {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  discountType  String    // percentage, fixed
+  discountValue Float
+  minPurchase   Float?    @default(0)
+  maxUses       Int?      
+  usedCount     Int       @default(0)
+  expiresAt     DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("coupons")
+  @@index([code])
+}
+
+model Article {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  excerpt         String?  @db.Text
+  content         String   @db.Text
+  imageUrl        String?
+  author          String?
+  relatedProducts String[] @default([]) // Array of product IDs
+  published       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("articles")
+  @@index([slug])
+  @@index([published])
+}
+
+model UserPreferences {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  activePetId          String?
+  emailNotifications   Boolean  @default(true)
+  recommendations      Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
