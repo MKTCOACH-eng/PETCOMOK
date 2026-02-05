@@ -1,13 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useCart } from '@/lib/cart-context';
 import Link from 'next/link';
 import Image from 'next/image';
-import { User, MapPin, Phone, Mail, CreditCard, AlertCircle, CheckCircle, Lock } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { User, MapPin, Phone, Mail, CreditCard, AlertCircle, Lock, Truck, Package, Clock, CheckCircle2, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface ShippingRate {
+  id: string;
+  carrier: string;
+  carrierName: string;
+  carrierLogo: string;
+  serviceType: string;
+  serviceName: string;
+  deliveryDays: number;
+  estimatedDelivery: string;
+  price: number;
+  currency: string;
+  zone: string;
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -15,6 +29,12 @@ export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  
+  // Shipping rates state
+  const [shippingRates, setShippingRates] = useState<ShippingRate[]>([]);
+  const [selectedRate, setSelectedRate] = useState<ShippingRate | null>(null);
+  const [loadingRates, setLoadingRates] = useState(false);
+  const [ratesError, setRatesError] = useState('');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -26,7 +46,55 @@ export default function CheckoutPage() {
     zipCode: '',
   });
 
-  // If not logged in, redirect to login
+  // Fetch shipping rates when zip code changes
+  useEffect(() => {
+    const fetchRates = async () => {
+      if (formData.zipCode.length === 5) {
+        setLoadingRates(true);
+        setRatesError('');
+        setSelectedRate(null);
+        
+        try {
+          const response = await fetch('/api/shipping/quote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              zipCode: formData.zipCode,
+              weight: 2, // Default weight in kg
+              declaredValue: totalPrice,
+            }),
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            setShippingRates(data.rates);
+            // Auto-select cheapest option
+            if (data.rates.length > 0) {
+              setSelectedRate(data.rates[0]);
+            }
+          } else {
+            setRatesError(data.error || 'Error al obtener cotizaciones');
+          }
+        } catch (err) {
+          setRatesError('Error de conexión');
+        } finally {
+          setLoadingRates(false);
+        }
+      } else {
+        setShippingRates([]);
+        setSelectedRate(null);
+      }
+    };
+
+    const debounce = setTimeout(fetchRates, 500);
+    return () => clearTimeout(debounce);
+  }, [formData.zipCode, totalPrice]);
+
+  // Calculate totals
+  const shippingCost = selectedRate?.price || 0;
+  const finalTotal = totalPrice + shippingCost;
+
   if (status === 'loading') {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -64,12 +132,18 @@ export default function CheckoutPage() {
     return null;
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!selectedRate) {
+      setError('Por favor selecciona un método de envío');
+      return;
+    }
+    
     setIsSubmitting(true);
     setError('');
 
@@ -84,7 +158,9 @@ export default function CheckoutPage() {
             price: item.price,
           })),
           shippingData: formData,
-          total: totalPrice,
+          shippingRate: selectedRate,
+          total: finalTotal,
+          shippingCost: shippingCost,
         }),
       });
 
@@ -127,7 +203,7 @@ export default function CheckoutPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] transition-colors"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] focus:outline-none transition-colors"
                       placeholder="Juan Pérez"
                     />
                   </div>
@@ -139,7 +215,7 @@ export default function CheckoutPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] transition-colors"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] focus:outline-none transition-colors"
                       placeholder="juan@email.com"
                     />
                   </div>
@@ -151,7 +227,7 @@ export default function CheckoutPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] transition-colors"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] focus:outline-none transition-colors"
                       placeholder="55 1234 5678"
                     />
                   </div>
@@ -173,7 +249,7 @@ export default function CheckoutPage() {
                       value={formData.address}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] transition-colors"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] focus:outline-none transition-colors"
                       placeholder="Calle, número, colonia"
                     />
                   </div>
@@ -186,7 +262,7 @@ export default function CheckoutPage() {
                         value={formData.city}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] transition-colors"
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] focus:outline-none transition-colors"
                         placeholder="CDMX"
                       />
                     </div>
@@ -198,7 +274,7 @@ export default function CheckoutPage() {
                         value={formData.state}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] transition-colors"
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] focus:outline-none transition-colors"
                         placeholder="CDMX"
                       />
                     </div>
@@ -210,12 +286,92 @@ export default function CheckoutPage() {
                         value={formData.zipCode}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] transition-colors"
+                        maxLength={5}
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] focus:outline-none transition-colors"
                         placeholder="01234"
                       />
                     </div>
                   </div>
                 </div>
+              </div>
+
+              {/* Shipping Options */}
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Truck className="w-5 h-5 text-[#7baaf7]" />
+                  Método de Envío
+                </h2>
+                
+                {formData.zipCode.length < 5 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>Ingresa tu código postal para ver las opciones de envío</p>
+                  </div>
+                ) : loadingRates ? (
+                  <div className="text-center py-8">
+                    <Loader2 className="w-8 h-8 mx-auto mb-3 text-[#7baaf7] animate-spin" />
+                    <p className="text-gray-600">Cotizando envíos...</p>
+                  </div>
+                ) : ratesError ? (
+                  <div className="text-center py-8 text-red-500">
+                    <AlertCircle className="w-12 h-12 mx-auto mb-3" />
+                    <p>{ratesError}</p>
+                  </div>
+                ) : shippingRates.length > 0 ? (
+                  <div className="space-y-3">
+                    {shippingRates.slice(0, 6).map((rate) => (
+                      <label
+                        key={rate.id}
+                        className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                          selectedRate?.id === rate.id
+                            ? 'border-[#7baaf7] bg-[#7baaf7]/5'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="shippingRate"
+                          value={rate.id}
+                          checked={selectedRate?.id === rate.id}
+                          onChange={() => setSelectedRate(rate)}
+                          className="w-5 h-5 text-[#7baaf7] border-gray-300 focus:ring-[#7baaf7]"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-gray-900">{rate.carrierName}</span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full ${
+                              rate.serviceType === 'express' ? 'bg-red-100 text-red-700' :
+                              rate.serviceType === 'standard' ? 'bg-blue-100 text-blue-700' :
+                              'bg-gray-100 text-gray-700'
+                            }`}>
+                              {rate.serviceName}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+                            <Clock className="w-4 h-4" />
+                            <span>{rate.deliveryDays === 1 ? 'Mañana' : `${rate.deliveryDays} días`}</span>
+                            <span className="text-gray-300">|</span>
+                            <span>{rate.estimatedDelivery}</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-lg font-bold text-gray-900">
+                            ${rate.price.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      </label>
+                    ))}
+                    
+                    <p className="text-xs text-gray-500 text-center mt-4">
+                      Powered by <span className="font-semibold">envia.com</span> · Cotización en tiempo real
+                    </p>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>No hay opciones de envío disponibles</p>
+                  </div>
+                )}
               </div>
 
               {error && (
@@ -266,19 +422,29 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Envío</span>
-                    <span className="text-[#41b375]">Gratis</span>
+                    {selectedRate ? (
+                      <span>${shippingCost.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
+                    ) : (
+                      <span className="text-gray-400">Por calcular</span>
+                    )}
                   </div>
+                  {selectedRate && (
+                    <div className="text-xs text-gray-500 flex items-center gap-1">
+                      <Truck className="w-3 h-3" />
+                      {selectedRate.carrierName} - {selectedRate.serviceName}
+                    </div>
+                  )}
                   <div className="border-t border-gray-100 pt-3">
                     <div className="flex justify-between text-lg font-bold text-gray-900">
                       <span>Total</span>
-                      <span>${totalPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
+                      <span>${finalTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
                     </div>
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !selectedRate}
                   className="mt-6 w-full py-3 bg-[#7baaf7] hover:bg-[#6999e6] text-white font-semibold rounded-lg transition-colors shadow-lg shadow-[#7baaf7]/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
@@ -293,6 +459,12 @@ export default function CheckoutPage() {
                     </>
                   )}
                 </button>
+
+                {!selectedRate && formData.zipCode.length === 5 && !loadingRates && (
+                  <p className="mt-2 text-xs text-center text-amber-600">
+                    Selecciona un método de envío para continuar
+                  </p>
+                )}
 
                 <p className="mt-4 text-xs text-center text-gray-500">
                   Al confirmar, aceptas procesar tu pedido. El pago se habilitará próximamente.

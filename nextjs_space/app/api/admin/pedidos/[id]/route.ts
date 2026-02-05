@@ -15,6 +15,36 @@ async function isAdmin() {
   return user?.isAdmin === true;
 }
 
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    if (!(await isAdmin())) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const order = await prisma.order.findUnique({
+      where: { id: params.id },
+      include: {
+        items: {
+          include: { product: true },
+        },
+        user: {
+          select: { name: true, email: true },
+        },
+        shipment: true,
+      },
+    });
+
+    if (!order) {
+      return NextResponse.json({ error: 'Pedido no encontrado' }, { status: 404 });
+    }
+
+    return NextResponse.json(order);
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    return NextResponse.json({ error: 'Error al obtener pedido' }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     if (!(await isAdmin())) {

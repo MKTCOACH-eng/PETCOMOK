@@ -126,21 +126,73 @@ model Order {
   total           Float
   subtotal        Float
   discount        Float    @default(0)
+  shippingCost    Float    @default(0)
   shippingAddress String?  @db.Text
   shippingName    String?
   shippingPhone   String?
   shippingEmail   String?
+  shippingCity    String?
+  shippingState   String?
+  shippingZipCode String?
   couponCode      String?
   stripePaymentId String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  user  User        @relation(fields: [userId], references: [id])
-  items OrderItem[]
+  user     User        @relation(fields: [userId], references: [id])
+  items    OrderItem[]
+  shipment Shipment?
 
   @@map("orders")
   @@index([userId])
   @@index([status])
+}
+
+model Shipment {
+  id              String    @id @default(cuid())
+  orderId         String    @unique
+  
+  // Carrier info
+  carrier         String    // fedex, dhl, estafeta, redpack, etc.
+  carrierName     String    // Nombre display
+  serviceType     String    // express, standard, economy
+  serviceName     String    // Nombre del servicio
+  
+  // Tracking
+  trackingNumber  String?
+  trackingUrl     String?
+  labelUrl        String?   // URL de la etiqueta PDF
+  
+  // Costs
+  shippingCost    Float
+  insuranceCost   Float     @default(0)
+  totalCost       Float
+  
+  // Dimensions & weight
+  weight          Float?    // kg
+  length          Float?    // cm
+  width           Float?    // cm
+  height          Float?    // cm
+  
+  // Status tracking
+  status          String    @default("pending") // pending, label_created, picked_up, in_transit, out_for_delivery, delivered, exception, returned
+  statusHistory   Json      @default("[]")
+  estimatedDelivery DateTime?
+  deliveredAt     DateTime?
+  
+  // Envia.com reference
+  enviaShipmentId String?   // ID de envío en Envia.com
+  enviaRateId     String?   // ID de cotización seleccionada
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("shipments")
+  @@index([trackingNumber])
+  @@index([status])
+  @@index([carrier])
 }
 
 model OrderItem {

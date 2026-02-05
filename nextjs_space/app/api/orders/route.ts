@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { items, shippingData } = body;
+    const { items, shippingData, shippingRate, shippingCost } = body;
 
     if (!items?.length) {
       return NextResponse.json({ error: 'El carrito está vacío' }, { status: 400 });
@@ -59,6 +59,10 @@ export async function POST(request: NextRequest) {
       0
     );
 
+    // Calculate total with shipping
+    const finalShippingCost = shippingCost || 0;
+    const total = subtotal + finalShippingCost;
+
     // Build shipping address string
     const shippingAddress = `${shippingData?.address}, ${shippingData?.city}, ${shippingData?.state} ${shippingData?.zipCode}`;
 
@@ -67,13 +71,17 @@ export async function POST(request: NextRequest) {
       data: {
         userId,
         status: 'pending',
-        total: subtotal,
+        total,
         subtotal,
         discount: 0,
+        shippingCost: finalShippingCost,
         shippingAddress,
         shippingName: shippingData?.name,
         shippingPhone: shippingData?.phone,
         shippingEmail: shippingData?.email,
+        shippingCity: shippingData?.city,
+        shippingState: shippingData?.state,
+        shippingZipCode: shippingData?.zipCode,
         items: {
           create: orderItems,
         },

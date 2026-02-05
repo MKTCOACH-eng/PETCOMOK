@@ -25,12 +25,12 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Productos', href: '/admin/productos', icon: Package },
   { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
+  { name: 'Envíos', href: '/admin/envios', icon: Truck },
   { name: 'Clientes', href: '/admin/clientes', icon: Users },
   { name: 'Blog & Tips', href: '/admin/contenido', icon: FileText },
   { name: 'Marketing', href: '/admin/marketing', icon: Megaphone },
   { name: 'Categorías', href: '/admin/categorias', icon: Tag },
   { name: 'Cupones', href: '/admin/cupones', icon: Ticket },
-  { name: 'Proveedores', href: '/admin/proveedores', icon: Truck },
 ];
 
 export function AdminSidebar() {
