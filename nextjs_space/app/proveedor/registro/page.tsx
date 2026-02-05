@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Eye, EyeOff, ArrowRight, AlertCircle, Check, Building, User, Mail, Phone, MapPin, Briefcase, CreditCard } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, AlertCircle, Check, Building, User, Mail, Phone, MapPin, Briefcase, CreditCard, Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 
 interface Category {
   id: string;
@@ -27,6 +27,7 @@ export default function ProviderRegisterPage() {
     categoryId: '',
     description: '',
     shortDescription: '',
+    logoUrl: '',
     
     // Step 2: Contact Info
     contactName: '',
@@ -46,6 +47,9 @@ export default function ProviderRegisterPage() {
     // Step 4: Services (simplified)
     services: [] as any[]
   });
+  
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   useEffect(() => {
     async function fetchCategories() {
@@ -64,6 +68,72 @@ export default function ProviderRegisterPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validar tamaño (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('La imagen no debe superar 5MB');
+      return;
+    }
+
+    setUploading(true);
+    setUploadError('');
+
+    try {
+      // Obtener URL presignada
+      const presignedRes = await fetch('/api/upload/presigned', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: file.name,
+          contentType: file.type,
+          isPublic: true
+        })
+      });
+
+      if (!presignedRes.ok) throw new Error('Error al obtener URL de subida');
+
+      const { uploadUrl, cloud_storage_path } = await presignedRes.json();
+
+      // Detectar si content-disposition está en los headers firmados
+      const urlObj = new URL(uploadUrl);
+      const signedHeaders = urlObj.searchParams.get('X-Amz-SignedHeaders') || '';
+      const needsContentDisposition = signedHeaders.includes('content-disposition');
+
+      // Subir directamente a S3
+      const headers: Record<string, string> = {
+        'Content-Type': file.type
+      };
+      if (needsContentDisposition) {
+        headers['Content-Disposition'] = 'attachment';
+      }
+
+      const uploadRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers,
+        body: file
+      });
+
+      if (!uploadRes.ok) throw new Error('Error al subir imagen');
+
+      // La URL pública es simplemente el uploadUrl sin los parámetros de query
+      const publicUrl = uploadUrl.split('?')[0];
+      
+      setFormData(prev => ({ ...prev, logoUrl: publicUrl }));
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setUploadError('Error al subir la imagen. Intenta de nuevo.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeLogo = () => {
+    setFormData({ ...formData, logoUrl: '' });
   };
 
   const validateStep = (currentStep: number) => {
@@ -266,6 +336,65 @@ export default function ProviderRegisterPage() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7baaf7] focus:border-transparent"
                     placeholder="Describe tus servicios, experiencia, especializaciones..."
                   />
+                </div>
+
+                {/* Logo/Foto Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Logo o Foto del Negocio</label>
+                  {formData.logoUrl ? (
+                    <div className="relative">
+                      <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-[#7baaf7] bg-gray-50">
+                        <Image
+                          src={formData.logoUrl}
+                          alt="Logo del negocio"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeLogo}
+                        className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-lg"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="logo-upload"
+                        disabled={uploading}
+                      />
+                      <label
+                        htmlFor="logo-upload"
+                        className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                          uploading 
+                            ? 'border-gray-300 bg-gray-50' 
+                            : 'border-gray-300 hover:border-[#7baaf7] hover:bg-[#7baaf7]/5'
+                        }`}
+                      >
+                        {uploading ? (
+                          <div className="flex flex-col items-center">
+                            <Loader2 className="w-8 h-8 text-[#7baaf7] animate-spin mb-2" />
+                            <span className="text-sm text-gray-500">Subiendo...</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
+                            <span className="text-sm text-gray-500">Clic para subir imagen</span>
+                            <span className="text-xs text-gray-400 mt-1">JPG, PNG, WebP (máx 5MB)</span>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  )}
+                  {uploadError && (
+                    <p className="mt-2 text-sm text-red-600">{uploadError}</p>
+                  )}
                 </div>
               </div>
             )}

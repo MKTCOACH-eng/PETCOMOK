@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Truck, Shield, Heart, Play, Lightbulb, FileText, Eye, Star, MapPin, Stethoscope, Scissors, GraduationCap, Home as HomeIcon, Dog } from 'lucide-react';
+import { ArrowRight, Truck, Shield, Heart, Play, Lightbulb, FileText, Eye, Star, MapPin, Stethoscope, Scissors, GraduationCap, Home as HomeIcon, Dog, MoreHorizontal } from 'lucide-react';
 import prisma from '@/lib/db';
 import { ProductCard } from '@/components/product-card';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
@@ -117,6 +117,7 @@ const serviceCategoryIcons: Record<string, React.ReactNode> = {
   entrenadores: <GraduationCap className="w-5 h-5" />,
   hospedaje: <HomeIcon className="w-5 h-5" />,
   paseadores: <Dog className="w-5 h-5" />,
+  otro: <MoreHorizontal className="w-5 h-5" />,
 };
 
 const contentTypeIcons: Record<string, React.ReactNode> = {
@@ -354,18 +355,29 @@ export default async function HomePage() {
       {/* Services Section - Top 3 Providers */}
       <section className="py-16 bg-white">
         <div className="max-w-[1200px] mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Servicios para tu Mascota</h2>
-              <p className="text-gray-600">Encuentra los mejores profesionales cerca de ti</p>
+          {/* Hero Banner para Servicios */}
+          <div className="relative rounded-2xl overflow-hidden mb-10 h-[280px] md:h-[320px]">
+            <Image
+              src="https://cdn.abacus.ai/images/02bec7c3-1c8f-466a-92be-a1a0cd5604e5.png"
+              alt="Servicios profesionales para mascotas - Veterinarios, estéticas y más"
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+            <div className="absolute inset-0 flex items-center">
+              <div className="max-w-xl px-8 md:px-12">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Servicios para tu Mascota</h2>
+                <p className="text-white/90 text-lg mb-6">Encuentra los mejores profesionales cerca de ti: veterinarios, estéticas, entrenadores y más</p>
+                <Link
+                  href="/servicios"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#7baaf7] rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg"
+                >
+                  Explorar servicios
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
             </div>
-            <Link
-              href="/servicios"
-              className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-[#7baaf7] hover:bg-[#7baaf7]/10 rounded-lg font-medium transition-colors"
-            >
-              Ver todos
-              <ArrowRight className="w-4 h-4" />
-            </Link>
           </div>
 
           {/* Service Categories Quick Filter */}

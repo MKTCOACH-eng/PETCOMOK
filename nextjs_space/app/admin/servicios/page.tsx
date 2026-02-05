@@ -3,9 +3,10 @@ import { prisma } from '@/lib/db';
 import { 
   Users, CheckCircle, Clock, AlertTriangle, Star, Eye, 
   Stethoscope, Scissors, GraduationCap, Home as HomeIcon, Dog,
-  Building, MapPin, Phone, Mail, ExternalLink
+  Building, MapPin, Phone, Mail, ExternalLink, MoreHorizontal
 } from 'lucide-react';
 import { ApprovalButtons } from './approval-buttons';
+import { AIReviewButton } from './ai-review-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ const serviceCategoryIcons: Record<string, React.ReactNode> = {
   entrenadores: <GraduationCap className="w-5 h-5" />,
   hospedaje: <HomeIcon className="w-5 h-5" />,
   paseadores: <Dog className="w-5 h-5" />,
+  otro: <MoreHorizontal className="w-5 h-5" />,
 };
 
 const membershipStatusColors: Record<string, string> = {
@@ -244,6 +246,10 @@ export default async function AdminServiciosPage({
 
                 {/* Actions */}
                 <div className="flex flex-col gap-2">
+                  {/* AI Review Button - Solo para proveedores pendientes */}
+                  {!provider.isApproved && (
+                    <AIReviewButton provider={{ id: provider.id, businessName: provider.businessName }} />
+                  )}
                   <ApprovalButtons provider={provider} />
                   <Link
                     href={`/servicios/${provider.slug}`}
