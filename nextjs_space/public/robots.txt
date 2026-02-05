@@ -1,3 +1,27 @@
-# Allow all web crawlers to access all content
+# PETCOM - Tienda Premium para Mascotas
+# https://petcom.mx
+
 User-agent: *
 Allow: /
+
+# Páginas importantes
+Allow: /catalogo
+Allow: /blog
+Allow: /servicios
+Allow: /producto/*
+
+# Bloquear áreas privadas
+Disallow: /admin/*
+Disallow: /api/*
+Disallow: /auth/*
+Disallow: /mi-cuenta/*
+Disallow: /pedidos/*
+Disallow: /checkout
+Disallow: /carrito
+Disallow: /proveedor/*
+
+# Sitemap
+Sitemap: https://petcom.mx/sitemap.xml
+
+# Crawl-delay para ser amigables con el servidor
+Crawl-delay: 1
