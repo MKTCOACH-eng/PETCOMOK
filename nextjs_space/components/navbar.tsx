@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
-import { ShoppingCart, User, Menu, X, LogOut, Package, Search } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogOut, Package, Search, PawPrint } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -87,6 +87,13 @@ export function Navbar() {
             {session ? (
               <div className="hidden md:flex items-center gap-2">
                 <Link
+                  href="/mis-mascotas"
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  title="Mis Mascotas"
+                >
+                  <PawPrint className="w-6 h-6 text-[#e67c73]" />
+                </Link>
+                <Link
                   href="/pedidos"
                   className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                   title="Mis Pedidos"
@@ -161,10 +168,19 @@ export function Navbar() {
               {session ? (
                 <>
                   <Link
-                    href="/pedidos"
-                    className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
+                    href="/mis-mascotas"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-[#e67c73] font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
+                    <PawPrint className="w-5 h-5" />
+                    Mis Mascotas
+                  </Link>
+                  <Link
+                    href="/pedidos"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Package className="w-5 h-5" />
                     Mis Pedidos
                   </Link>
                   <button
@@ -172,8 +188,9 @@ export function Navbar() {
                       signOut();
                       setMobileMenuOpen(false);
                     }}
-                    className="block w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
+                    className="flex items-center gap-2 w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
                   >
+                    <LogOut className="w-5 h-5" />
                     Cerrar Sesión
                   </button>
                 </>

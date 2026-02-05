@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { ArrowRight, Truck, Shield, Heart } from 'lucide-react';
 import prisma from '@/lib/db';
 import { ProductCard } from '@/components/product-card';
+import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,6 +125,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Personalized Recommendations with AI */}
+      <PersonalizedRecommendations />
 
       {/* Featured Products */}
       <section className="py-16">
