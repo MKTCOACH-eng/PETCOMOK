@@ -1,16 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, Truck, Shield, Heart, Dog, Cat, Package } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, Truck, Shield, Heart } from 'lucide-react';
 import prisma from '@/lib/db';
 import { ProductCard } from '@/components/product-card';
 
 export const dynamic = 'force-dynamic';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-}
 
 interface Product {
   id: string;
@@ -20,6 +14,29 @@ interface Product {
   category: { name: string } | null;
 }
 
+const CATEGORIES = [
+  {
+    name: 'Perros',
+    slug: 'perros',
+    image: 'https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/iconos/WhatsApp%20Image%202026-02-04%20at%2018.21.09.jpeg',
+  },
+  {
+    name: 'Gatos',
+    slug: 'gatos',
+    image: 'https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/iconos/WhatsApp%20Image%202026-02-04%20at%2018.22.33.jpeg',
+  },
+  {
+    name: 'Mascotas Pequeñas',
+    slug: 'mascotas-pequenas',
+    image: 'https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/iconos/WhatsApp%20Image%202026-02-04%20at%2018.24.28.jpeg',
+  },
+  {
+    name: 'Aves',
+    slug: 'aves',
+    image: 'https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/iconos/WhatsApp%20Image%202026-02-04%20at%2018.29.37.jpeg',
+  },
+];
+
 async function getFeaturedProducts() {
   return prisma.product.findMany({
     where: { featured: true },
@@ -28,20 +45,13 @@ async function getFeaturedProducts() {
   });
 }
 
-async function getCategories() {
-  return prisma.category.findMany();
-}
-
 export default async function HomePage() {
-  const [products, categories] = await Promise.all([
-    getFeaturedProducts(),
-    getCategories(),
-  ]);
+  const products = await getFeaturedProducts();
 
   return (
     <div className="min-h-screen">
       {/* Hero Section with Video */}
-      <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
+      <section className="relative h-[75vh] min-h-[550px] overflow-hidden">
         <video
           autoPlay
           loop
@@ -53,42 +63,32 @@ export default async function HomePage() {
         </video>
         
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
         
         {/* Content */}
-        <div className="relative z-10 h-full max-w-[1200px] mx-auto px-4 flex items-center">
-          <div className="max-w-xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              Todo para tu <span className="text-[#7baaf7]">mejor amigo</span>
-            </h1>
-            <p className="text-lg md:text-xl text-gray-200 mb-8">
-              Descubre productos premium para el bienestar de tus mascotas. 
-              Alimentos, accesorios y más, todo en un solo lugar.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/catalogo"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#7baaf7] hover:bg-[#6999e6] text-white font-semibold rounded-lg transition-colors shadow-lg shadow-[#7baaf7]/30"
-              >
-                Ver Catálogo
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/catalogo?category=perros"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur hover:bg-white/20 text-white font-semibold rounded-lg transition-colors border border-white/30"
-              >
-                <Dog className="w-5 h-5" />
-                Perros
-              </Link>
-              <Link
-                href="/catalogo?category=gatos"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur hover:bg-white/20 text-white font-semibold rounded-lg transition-colors border border-white/30"
-              >
-                <Cat className="w-5 h-5" />
-                Gatos
-              </Link>
-            </div>
+        <div className="relative z-10 h-full max-w-[1200px] mx-auto px-4 flex flex-col items-center justify-center text-center">
+          {/* Logo grande */}
+          <div className="relative w-72 md:w-96 h-32 md:h-40 mb-8">
+            <Image
+              src="https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/LOGO/logo%20blanco.png"
+              alt="Petcom"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
+          
+          <p className="text-lg md:text-2xl text-white/90 mb-8 max-w-2xl">
+            Donde el amor por tu mascota se convierte en bienestar
+          </p>
+          
+          <Link
+            href="/catalogo"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#7baaf7] hover:bg-[#6999e6] text-white font-semibold rounded-full transition-all shadow-lg shadow-[#7baaf7]/30 hover:scale-105"
+          >
+            Descubre nuestra selección
+            <ArrowRight className="w-5 h-5" />
+          </Link>
         </div>
       </section>
 
@@ -96,39 +96,31 @@ export default async function HomePage() {
       <section className="py-16 bg-[#F7F8FA]">
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Categorías</h2>
-            <p className="text-gray-600">Encuentra lo que necesitas para cada tipo de mascota</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">¿A quién estamos consintiendo hoy?</h2>
+            <p className="text-gray-600">Elige a tu compañero y encuentra lo mejor para él</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {categories.map((category: Category, index: number) => {
-              const icons: Record<string, React.ReactNode> = {
-                perros: <Dog className="w-10 h-10" />,
-                gatos: <Cat className="w-10 h-10" />,
-                accesorios: <Package className="w-10 h-10" />,
-              };
-              const colors: Record<string, string> = {
-                perros: 'bg-[#7baaf7]',
-                gatos: 'bg-[#ba67c8]',
-                accesorios: 'bg-[#41b375]',
-              };
-              
-              return (
-                <Link
-                  key={category.id}
-                  href={`/catalogo?category=${category.slug}`}
-                  className="group bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 text-center"
-                >
-                  <div className={`inline-flex items-center justify-center w-20 h-20 ${colors[category.slug] || 'bg-gray-200'} text-white rounded-2xl mb-6 group-hover:scale-110 transition-transform`}>
-                    {icons[category.slug] || <Package className="w-10 h-10" />}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#7baaf7] transition-colors">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {CATEGORIES.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/catalogo?category=${category.slug}`}
+                className="group relative overflow-hidden rounded-2xl aspect-square shadow-md hover:shadow-xl transition-all duration-300"
+              >
+                <Image
+                  src={category.image}
+                  alt={category.name}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="text-lg md:text-xl font-bold text-white">
                     {category.name}
                   </h3>
-                  <p className="text-gray-500 text-sm">{category.description}</p>
-                </Link>
-              );
-            })}
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -138,14 +130,14 @@ export default async function HomePage() {
         <div className="max-w-[1200px] mx-auto px-4">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Productos Destacados</h2>
-              <p className="text-gray-600">Los favoritos de nuestros clientes</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Lo que más les gusta</h2>
+              <p className="text-gray-600">Productos favoritos de nuestra comunidad peluda</p>
             </div>
             <Link
               href="/catalogo"
               className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-[#7baaf7] hover:bg-[#7baaf7]/10 rounded-lg font-medium transition-colors"
             >
-              Ver todos
+              Ver todo
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -177,8 +169,8 @@ export default async function HomePage() {
                 <Truck className="w-6 h-6 text-[#7baaf7]" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Envío Rápido</h3>
-                <p className="text-sm text-gray-600">Recibe tus productos en 24-48 horas en toda la república</p>
+                <h3 className="font-semibold text-gray-900 mb-1">Llega volando</h3>
+                <p className="text-sm text-gray-600">Enviamos a todo México en 24-48 horas. Tu mascota no tendrá que esperar.</p>
               </div>
             </div>
 
@@ -187,8 +179,8 @@ export default async function HomePage() {
                 <Shield className="w-6 h-6 text-[#41b375]" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Compra Segura</h3>
-                <p className="text-sm text-gray-600">Todos tus pagos están protegidos y encriptados</p>
+                <h3 className="font-semibold text-gray-900 mb-1">Compra tranquilo</h3>
+                <p className="text-sm text-gray-600">Pagos 100% seguros. Si algo no está bien, lo resolvemos juntos.</p>
               </div>
             </div>
 
@@ -197,8 +189,8 @@ export default async function HomePage() {
                 <Heart className="w-6 h-6 text-[#e67c73]" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 mb-1">Calidad Premium</h3>
-                <p className="text-sm text-gray-600">Solo los mejores productos para tu mascota</p>
+                <h3 className="font-semibold text-gray-900 mb-1">Selección con cariño</h3>
+                <p className="text-sm text-gray-600">Cada producto lo elegiríamos para nuestras propias mascotas.</p>
               </div>
             </div>
           </div>
@@ -209,16 +201,16 @@ export default async function HomePage() {
       <section className="py-20 bg-gradient-to-r from-[#7baaf7] to-[#ba67c8]">
         <div className="max-w-[1200px] mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            ¿Listo para consentir a tu mascota?
+            Tu mascota merece lo mejor
           </h2>
           <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-            Únete a miles de dueños felices que confían en PETCOM para el cuidado de sus mascotas.
+            Únete a miles de familias que confían en nosotros para el cuidado diario de sus compañeros.
           </p>
           <Link
             href="/catalogo"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#7baaf7] font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-xl"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#7baaf7] font-bold rounded-full hover:bg-gray-100 transition-colors shadow-xl hover:scale-105"
           >
-            Explorar Tienda
+            Empezar a explorar
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

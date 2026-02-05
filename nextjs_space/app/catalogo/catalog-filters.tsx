@@ -1,14 +1,47 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 interface Category {
   id: string;
   name: string;
   slug: string;
 }
+
+const MAIN_CATEGORIES = [
+  {
+    name: 'Perros',
+    slug: 'perros',
+    image: 'https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/iconos/WhatsApp%20Image%202026-02-04%20at%2018.21.09.jpeg',
+  },
+  {
+    name: 'Gatos',
+    slug: 'gatos',
+    image: 'https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/iconos/WhatsApp%20Image%202026-02-04%20at%2018.22.33.jpeg',
+  },
+  {
+    name: 'Mascotas Pequeñas',
+    slug: 'mascotas-pequenas',
+    image: 'https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/iconos/WhatsApp%20Image%202026-02-04%20at%2018.24.28.jpeg',
+  },
+  {
+    name: 'Aves',
+    slug: 'aves',
+    image: 'https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/iconos/WhatsApp%20Image%202026-02-04%20at%2018.29.37.jpeg',
+  },
+];
+
+const SUBCATEGORIES = [
+  { name: 'Alimento', slug: 'alimento' },
+  { name: 'Juguetes', slug: 'juguetes' },
+  { name: 'Accesorios', slug: 'accesorios' },
+  { name: 'Higiene', slug: 'higiene' },
+  { name: 'Camas y Casas', slug: 'camas' },
+  { name: 'Salud', slug: 'salud' },
+];
 
 export function CatalogFilters({ 
   categories, 
@@ -21,95 +54,117 @@ export function CatalogFilters({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [search, setSearch] = useState(currentSearch || '');
-
-  useEffect(() => {
-    setSearch(currentSearch || '');
-  }, [currentSearch]);
+  const currentSubcategory = searchParams?.get('subcategory') || '';
 
   const handleCategoryChange = (slug: string) => {
-    const params = new URLSearchParams(searchParams?.toString() || '');
+    const params = new URLSearchParams();
     if (slug) {
       params.set('category', slug);
-    } else {
-      params.delete('category');
+    }
+    if (currentSearch) {
+      params.set('search', currentSearch);
     }
     router.push(`/catalogo?${params.toString()}`);
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubcategoryChange = (slug: string) => {
     const params = new URLSearchParams(searchParams?.toString() || '');
-    if (search.trim()) {
-      params.set('search', search.trim());
+    if (slug) {
+      params.set('subcategory', slug);
     } else {
-      params.delete('search');
+      params.delete('subcategory');
     }
     router.push(`/catalogo?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    setSearch('');
     router.push('/catalogo');
   };
 
-  const hasFilters = currentCategory || currentSearch;
+  const hasFilters = currentCategory || currentSearch || currentSubcategory;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-      <div className="flex flex-col md:flex-row gap-4">
-        {/* Search */}
-        <form onSubmit={handleSearch} className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar productos..."
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:border-[#7baaf7] transition-colors"
-            />
-          </div>
-        </form>
-
-        {/* Category Filter */}
-        <div className="flex flex-wrap gap-2">
+    <div className="space-y-4 mb-6">
+      {/* Main Categories - Visual Cards */}
+      <div className="bg-white rounded-xl shadow-sm p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-medium text-gray-700">Tipo de mascota</h3>
+          {hasFilters && (
+            <button
+              onClick={clearFilters}
+              className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#e67c73] transition-colors"
+            >
+              <X className="w-4 h-4" />
+              Limpiar filtros
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={() => handleCategoryChange('')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-4 py-2 rounded-full font-medium transition-all ${
               !currentCategory
-                ? 'bg-[#7baaf7] text-white'
+                ? 'bg-[#7baaf7] text-white shadow-md'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             Todos
           </button>
-          {categories.map((cat) => (
+          {MAIN_CATEGORIES.map((cat) => (
             <button
-              key={cat.id}
+              key={cat.slug}
               onClick={() => handleCategoryChange(cat.slug)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-full font-medium transition-all ${
                 currentCategory === cat.slug
-                  ? 'bg-[#7baaf7] text-white'
+                  ? 'bg-[#7baaf7] text-white shadow-md'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
+              <div className="relative w-6 h-6 rounded-full overflow-hidden">
+                <Image
+                  src={cat.image}
+                  alt={cat.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
               {cat.name}
             </button>
           ))}
         </div>
-
-        {/* Clear Filters */}
-        {hasFilters && (
-          <button
-            onClick={clearFilters}
-            className="flex items-center gap-1 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <X className="w-4 h-4" />
-            Limpiar
-          </button>
-        )}
       </div>
+
+      {/* Subcategories - Show when a main category is selected */}
+      {currentCategory && (
+        <div className="bg-white rounded-xl shadow-sm p-4">
+          <h3 className="font-medium text-gray-700 mb-3">¿Qué estás buscando?</h3>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => handleSubcategoryChange('')}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                !currentSubcategory
+                  ? 'bg-[#41b375] text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Todo
+            </button>
+            {SUBCATEGORIES.map((sub) => (
+              <button
+                key={sub.slug}
+                onClick={() => handleSubcategoryChange(sub.slug)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  currentSubcategory === sub.slug
+                    ? 'bg-[#41b375] text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {sub.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

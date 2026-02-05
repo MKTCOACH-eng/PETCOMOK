@@ -1,27 +1,46 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
-import { ShoppingCart, User, Menu, X, LogOut, Package } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogOut, Package, Search } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 export function Navbar() {
   const { data: session } = useSession() || {};
   const { totalItems } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/catalogo?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setSearchOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
       <div className="max-w-[1200px] mx-auto px-4">
         <nav className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-[#7baaf7] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">🐾</span>
+          {/* Logo - Solo favicon */}
+          <Link href="/" className="flex items-center">
+            <div className="relative w-12 h-12">
+              <Image
+                src="https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/LOGO/Favicon.png"
+                alt="Petcom"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
-            <span className="text-xl font-bold text-gray-900">PETCOM</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -35,10 +54,38 @@ export function Navbar() {
             <Link href="/catalogo?category=gatos" className="text-gray-600 hover:text-[#7baaf7] transition-colors font-medium">
               Gatos
             </Link>
+            <Link href="/catalogo?category=mascotas-pequenas" className="text-gray-600 hover:text-[#7baaf7] transition-colors font-medium">
+              Mascotas Pequeñas
+            </Link>
+            <Link href="/catalogo?category=aves" className="text-gray-600 hover:text-[#7baaf7] transition-colors font-medium">
+              Aves
+            </Link>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-3">
+          {/* Search & Actions */}
+          <div className="flex items-center gap-2">
+            {/* Desktop Search */}
+            <form onSubmit={handleSearch} className="hidden md:flex items-center">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar productos..."
+                  className="w-48 lg:w-64 pl-10 pr-4 py-2 rounded-full bg-gray-100 border border-transparent focus:border-[#7baaf7] focus:bg-white focus:outline-none transition-all text-sm"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              </div>
+            </form>
+
+            {/* Mobile Search Toggle */}
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <Search className="w-5 h-5 text-gray-700" />
+            </button>
+
             <Link
               href="/carrito"
               className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -96,6 +143,30 @@ export function Navbar() {
           </div>
         </nav>
 
+        {/* Mobile Search Bar */}
+        <AnimatePresence>
+          {searchOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden py-3 border-t border-gray-100"
+            >
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="¿Qué estás buscando para tu mascota?"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-100 border border-transparent focus:border-[#7baaf7] focus:bg-white focus:outline-none transition-all"
+                  autoFocus
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Mobile Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
@@ -125,6 +196,20 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Gatos
+              </Link>
+              <Link
+                href="/catalogo?category=mascotas-pequenas"
+                className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Mascotas Pequeñas
+              </Link>
+              <Link
+                href="/catalogo?category=aves"
+                className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Aves
               </Link>
               {session ? (
                 <>

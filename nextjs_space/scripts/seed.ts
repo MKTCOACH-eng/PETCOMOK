@@ -6,6 +6,8 @@ const prisma = new PrismaClient();
 const categories = [
   { name: 'Perros', slug: 'perros', description: 'Todo para tu mejor amigo canino' },
   { name: 'Gatos', slug: 'gatos', description: 'Lo mejor para tu felino' },
+  { name: 'Mascotas Pequeñas', slug: 'mascotas-pequenas', description: 'Para hamsters, conejos, cuyos y más' },
+  { name: 'Aves', slug: 'aves', description: 'Todo para tus amigos emplumados' },
   { name: 'Accesorios', slug: 'accesorios', description: 'Accesorios para todas las mascotas' },
 ];
 
@@ -179,15 +181,16 @@ async function main() {
   }
 
   // Create test admin user
-  const hashedPassword = await bcrypt.hash('johndoe123', 10);
+  const hashedPassword = await bcrypt.hash('petcom123', 10);
   await prisma.user.create({
     data: {
-      email: 'john@doe.com',
-      name: 'John Doe',
+      email: 'test@petcom.com',
+      name: 'Usuario Test',
+      password: hashedPassword,
       isAdmin: true,
     },
   });
-  console.log('👤 Created test admin user');
+  console.log('👤 Created test admin user: test@petcom.com / petcom123');
 
   console.log('✅ Seed completed successfully!');
 }
