@@ -380,22 +380,6 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {/* Service Categories Quick Filter */}
-          {serviceCategories.length > 0 && (
-            <div className="flex flex-wrap gap-3 mb-8">
-              {serviceCategories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/servicios?categoria=${cat.slug}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-[#7baaf7]/10 hover:text-[#7baaf7] rounded-full text-sm font-medium transition-colors"
-                >
-                  {serviceCategoryIcons[cat.slug] || <Star className="w-4 h-4" />}
-                  {cat.name}
-                </Link>
-              ))}
-            </div>
-          )}
-
           {/* Top 3 Service Providers */}
           {serviceProviders.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -465,33 +449,27 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <Stethoscope className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Próximamente</h3>
-              <p className="text-gray-600 mb-4">Estamos incorporando los mejores profesionales para tu mascota</p>
-              <Link
-                href="/proveedor/registro"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#7baaf7] text-white rounded-lg font-medium hover:bg-[#6a9be6] transition-colors"
-              >
-                ¿Eres profesional? Únete aquí
-              </Link>
+            <div className="relative rounded-2xl overflow-hidden h-[300px]">
+              <Image
+                src="https://cdn.abacus.ai/images/9df71791-49b4-42a6-92df-c1b08f7e0433.png"
+                alt="Paseador de perros profesional"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                <h3 className="text-2xl font-bold mb-2">Conecta con los mejores profesionales</h3>
+                <p className="text-white/90 mb-4">Veterinarios, estéticas, entrenadores, paseadores y más</p>
+                <Link
+                  href="/servicios"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#7baaf7] rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  Ver todos los servicios
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
             </div>
           )}
-
-          {/* CTA for Providers */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-gradient-to-r from-[#7baaf7]/10 to-[#ba67c8]/10 rounded-xl">
-            <div>
-              <h3 className="font-bold text-gray-900 mb-1">¿Ofreces servicios para mascotas?</h3>
-              <p className="text-gray-600 text-sm">Únete a PETCOM y recibe clientes desde $299/mes</p>
-            </div>
-            <Link
-              href="/proveedor/registro"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-[#7baaf7] text-white rounded-lg font-medium hover:bg-[#6a9be6] transition-colors whitespace-nowrap"
-            >
-              Registrar mi negocio
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
 
           <div className="mt-6 text-center md:hidden">
             <Link
