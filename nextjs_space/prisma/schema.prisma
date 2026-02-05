@@ -79,6 +79,7 @@ model Product {
   taxIncluded          Boolean  @default(true)
   
   // Dropshipping fields
+  isDropshipping       Boolean  @default(false)
   supplierId           String?
   supplierSku          String?
   supplierPrice        Float?
