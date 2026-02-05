@@ -206,3 +206,18 @@ model UserPreferences {
 
   @@map("user_preferences")
 }
+
+model Subscriber {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  isActive      Boolean   @default(true)
+  source        String    @default("footer") // footer, popup, checkout
+  tags          String[]  @default([])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("subscribers")
+  @@index([email])
+  @@index([isActive])
+}
