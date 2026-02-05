@@ -11,10 +11,10 @@ export function Footer() {
           {/* Logo - Much larger and centered */}
           <div className="mb-4">
             <Image
-              src="https://static.wixstatic.com/media/84b06e_2e6b4d0f613e4354b58b1eabf225ee9e~mv2.jpg/v1/fill/w_924,h_883,al_c,q_85,enc_avif,quality_auto/84b06e_2e6b4d0f613e4354b58b1eabf225ee9e~mv2.jpg"
-              alt="PETCOM"
+              src="/logo-petcom.png"
+              alt="PETCOM - Everything for your pet"
               width={320}
-              height={120}
+              height={140}
               className="object-contain"
               priority
             />
