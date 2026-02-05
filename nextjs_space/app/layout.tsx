@@ -4,6 +4,7 @@ import './globals.css';
 import { Providers } from '@/components/providers';
 import { Navbar } from '@/components/navbar';
 import { Footer } from '@/components/footer';
+import { PetBotWidget } from '@/components/petbot-widget';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,7 +22,6 @@ export default function RootLayout({
     <html lang="es">
       <head>
         <script src="https://apps.abacus.ai/chatllm/appllm-lib.js"></script>
-        <script src="https://api.abacus.ai/api/v0/getChatBotWidgetSDKLink?externalApplicationId=6b3291c6" async></script>
       </head>
       <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
         <Providers>
@@ -30,6 +30,7 @@ export default function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <PetBotWidget />
         </Providers>
       </body>
     </html>
