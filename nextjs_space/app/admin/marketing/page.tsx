@@ -8,7 +8,12 @@ import {
   Send, 
   UserPlus,
   UserMinus,
-  Calendar
+  Calendar,
+  FileText,
+  BarChart3,
+  Target,
+  Clock,
+  CheckCircle
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -56,6 +61,13 @@ export default async function MarketingPage() {
     where: { createdAt: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } }
   });
   const growthPercent = prev30Days > 0 ? Math.round(((last30Days - prev30Days) / prev30Days) * 100) : 100;
+
+  // Campaign statistics
+  const totalCampaigns = await prisma.emailCampaign.count();
+  const sentCampaigns = await prisma.emailCampaign.count({ where: { status: 'sent' } });
+  const scheduledCampaigns = await prisma.emailCampaign.count({ where: { status: 'scheduled' } });
+  const totalEmailsSent = await prisma.emailCampaign.aggregate({ _sum: { sentCount: true } });
+  const templateCount = await prisma.emailTemplate.count({ where: { isActive: true } });
 
   return (
     <div className="space-y-6">
@@ -136,12 +148,78 @@ export default async function MarketingPage() {
         </div>
       </div>
 
+      {/* Campaign Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-[#7baaf7] to-[#4285f4] rounded-xl p-4 text-white">
+          <div className="flex items-center gap-3">
+            <Send className="w-8 h-8 opacity-80" />
+            <div>
+              <p className="text-2xl font-bold">{sentCampaigns}</p>
+              <p className="text-sm opacity-90">Campañas enviadas</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl p-4 text-white">
+          <div className="flex items-center gap-3">
+            <Clock className="w-8 h-8 opacity-80" />
+            <div>
+              <p className="text-2xl font-bold">{scheduledCampaigns}</p>
+              <p className="text-sm opacity-90">Programadas</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl p-4 text-white">
+          <div className="flex items-center gap-3">
+            <Mail className="w-8 h-8 opacity-80" />
+            <div>
+              <p className="text-2xl font-bold">{(totalEmailsSent._sum.sentCount || 0).toLocaleString()}</p>
+              <p className="text-sm opacity-90">Emails enviados</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-4 text-white">
+          <div className="flex items-center gap-3">
+            <FileText className="w-8 h-8 opacity-80" />
+            <div>
+              <p className="text-2xl font-bold">{templateCount}</p>
+              <p className="text-sm opacity-90">Plantillas</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Quick Actions */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h2>
           <div className="space-y-3">
+            <Link
+              href="/admin/marketing/campanas/nueva"
+              className="flex items-center gap-3 p-3 rounded-lg border border-[#7baaf7] bg-blue-50 hover:bg-blue-100 transition-colors"
+            >
+              <div className="p-2 bg-[#7baaf7] rounded-lg">
+                <Send className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Nueva Campaña</p>
+                <p className="text-sm text-gray-500">Con segmentación</p>
+              </div>
+            </Link>
+            
+            <Link
+              href="/admin/marketing/campanas"
+              className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <div className="p-2 bg-green-100 rounded-lg">
+                <BarChart3 className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">Ver Campañas</p>
+                <p className="text-sm text-gray-500">{totalCampaigns} campañas</p>
+              </div>
+            </Link>
+
             <Link
               href="/admin/marketing/suscriptores"
               className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
@@ -165,32 +243,6 @@ export default async function MarketingPage() {
               <div>
                 <p className="font-medium text-gray-900">Importar Lista</p>
                 <p className="text-sm text-gray-500">Desde CSV/Excel</p>
-              </div>
-            </Link>
-            
-            <Link
-              href="/admin/marketing/campanas"
-              className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Mail className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Campañas de Email</p>
-                <p className="text-sm text-gray-500">Envío masivo</p>
-              </div>
-            </Link>
-            
-            <Link
-              href="/api/admin/marketing/export?format=csv"
-              className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <TrendingUp className="w-5 h-5 text-orange-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Exportar Lista</p>
-                <p className="text-sm text-gray-500">Descargar CSV</p>
               </div>
             </Link>
           </div>

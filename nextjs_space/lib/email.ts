@@ -55,7 +55,7 @@ export async function sendEmail({ to, subject, body, notificationId }: EmailOpti
 }
 
 // Email template wrapper
-function emailWrapper(content: string) {
+export function emailWrapper(content: string) {
   return `
     <!DOCTYPE html>
     <html>

@@ -292,12 +292,73 @@ model Subscriber {
   isActive      Boolean   @default(true)
   source        String    @default("footer") // footer, popup, checkout
   tags          String[]  @default([])
+  
+  // Segmentation fields
+  petTypes      String[]  @default([]) // perro, gato, etc.
+  city          String?
+  totalPurchases Int      @default(0)
+  lastPurchase  DateTime?
+  
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   @@map("subscribers")
   @@index([email])
   @@index([isActive])
+}
+
+// Email Marketing Campaigns
+model EmailCampaign {
+  id            String    @id @default(cuid())
+  name          String
+  subject       String
+  preheader     String?
+  content       String    @db.Text
+  
+  // Targeting
+  segment       String?   // all, new, active, inactive, high_value, pet_dog, pet_cat
+  segmentFilters Json?    // Custom filters
+  
+  // Scheduling
+  status        String    @default("draft") // draft, scheduled, sending, sent, cancelled
+  scheduledAt   DateTime?
+  sentAt        DateTime?
+  
+  // Stats
+  totalRecipients Int     @default(0)
+  sentCount     Int       @default(0)
+  failedCount   Int       @default(0)
+  
+  // Template
+  templateId    String?
+  template      EmailTemplate? @relation(fields: [templateId], references: [id])
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("email_campaigns")
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+// Email Templates
+model EmailTemplate {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  category      String    @default("general") // welcome, promo, newsletter, abandoned_cart, restock
+  subject       String
+  preheader     String?
+  content       String    @db.Text
+  thumbnail     String?
+  isActive      Boolean   @default(true)
+  
+  campaigns     EmailCampaign[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("email_templates")
 }
 
 // ========================================

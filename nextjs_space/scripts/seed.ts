@@ -397,6 +397,105 @@ async function main() {
     }
   }
 
+  // Create email templates
+  const emailTemplates = [
+    {
+      name: 'Bienvenida',
+      description: 'Email de bienvenida para nuevos suscriptores',
+      category: 'welcome',
+      subject: '🐾 ¡Bienvenido a la familia PETCOM!',
+      preheader: 'Gracias por unirte a nuestra comunidad de amantes de mascotas',
+      content: `<h1>¡Hola {{nombre}}! 👋</h1>
+<p>Nos alegra mucho que te hayas unido a <strong>PETCOM</strong>, la comunidad más grande de amantes de mascotas en México.</p>
+<p>Aquí encontrarás:</p>
+<ul>
+  <li>🛒 Los mejores productos para tu mascota</li>
+  <li>💡 Tips y consejos de expertos</li>
+  <li>🎁 Ofertas exclusivas para suscriptores</li>
+</ul>
+<p>Como regalo de bienvenida, usa el código <strong>BIENVENIDO10</strong> para obtener un 10% de descuento en tu primera compra.</p>
+<p>¡Que tu mascota sea muy feliz!</p>
+<p>El equipo de PETCOM 🐶🐱</p>`
+    },
+    {
+      name: 'Promoción General',
+      description: 'Plantilla para promociones y descuentos',
+      category: 'promo',
+      subject: '🔥 ¡Ofertas especiales para tu mascota!',
+      preheader: 'Descuentos increíbles que no puedes dejar pasar',
+      content: `<h1>¡Hola {{nombre}}! 🎉</h1>
+<p>Tenemos <strong>ofertas especiales</strong> que tu mascota va a amar:</p>
+<div style="background: #f0f7ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+  <h2 style="color: #7baaf7; margin: 0;">¡HASTA 30% OFF!</h2>
+  <p>En productos seleccionados</p>
+</div>
+<p>No dejes pasar esta oportunidad. La promoción es por tiempo limitado.</p>
+<a href="https://petcom.mx/catalogo" style="display: inline-block; background: #7baaf7; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Ver ofertas</a>
+<p>¡Gracias por ser parte de PETCOM!</p>`
+    },
+    {
+      name: 'Newsletter Mensual',
+      description: 'Boletín mensual con novedades',
+      category: 'newsletter',
+      subject: '📰 Novedades de PETCOM - {{mes}}',
+      preheader: 'Las últimas noticias y productos para tu mascota',
+      content: `<h1>¡Hola {{nombre}}! 📬</h1>
+<p>Te traemos las novedades del mes:</p>
+<h2>🆕 Nuevos Productos</h2>
+<p>Descubre los últimos productos que llegaron a nuestra tienda.</p>
+<h2>📝 Tips del Mes</h2>
+<p>Consejos útiles para el cuidado de tu mascota.</p>
+<h2>🎁 Ofertas Especiales</h2>
+<p>Promociones exclusivas para nuestros suscriptores.</p>
+<a href="https://petcom.mx" style="display: inline-block; background: #7baaf7; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Visitar PETCOM</a>
+<p>¡Gracias por leernos!</p>`
+    },
+    {
+      name: 'Dueños de Perros',
+      description: 'Contenido específico para dueños de perros',
+      category: 'segment',
+      subject: '🐕 ¡Especial para tu perro!',
+      preheader: 'Productos y tips para consentir a tu mejor amigo',
+      content: `<h1>¡Hola {{nombre}}! 🐕</h1>
+<p>Sabemos cuánto quieres a tu perro, por eso te traemos:</p>
+<h2>Productos Destacados para Perros</h2>
+<ul>
+  <li>Alimentos premium de alta calidad</li>
+  <li>Juguetes resistentes y divertidos</li>
+  <li>Camas cómodas y ortopédicas</li>
+  <li>Accesorios para paseo</li>
+</ul>
+<a href="https://petcom.mx/catalogo?category=perros" style="display: inline-block; background: #7baaf7; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Ver productos para perros</a>
+<p>🐾 ¡Tu perro lo merece todo!</p>`
+    },
+    {
+      name: 'Dueños de Gatos',
+      description: 'Contenido específico para dueños de gatos',
+      category: 'segment',
+      subject: '🐱 ¡Especial para tu gato!',
+      preheader: 'Todo lo que tu felino necesita',
+      content: `<h1>¡Hola {{nombre}}! 🐱</h1>
+<p>Los gatos merecen lo mejor, y aquí lo tenemos:</p>
+<h2>Productos Destacados para Gatos</h2>
+<ul>
+  <li>Alimento gourmet y premium</li>
+  <li>Torres rascadoras modernas</li>
+  <li>Juguetes interactivos</li>
+  <li>Arena y accesorios de higiene</li>
+</ul>
+<a href="https://petcom.mx/catalogo?category=gatos" style="display: inline-block; background: #7baaf7; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Ver productos para gatos</a>
+<p>🐾 ¡Haz feliz a tu gatito!</p>`
+    },
+  ];
+
+  for (const template of emailTemplates) {
+    const existing = await prisma.emailTemplate.findFirst({ where: { name: template.name } });
+    if (!existing) {
+      await prisma.emailTemplate.create({ data: template });
+      console.log(`📧 Created email template: ${template.name}`);
+    }
+  }
+
   console.log('✅ Seed completed successfully!');
 }
 
