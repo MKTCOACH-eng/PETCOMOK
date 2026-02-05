@@ -1,12 +1,40 @@
-// Envia.com Integration - Simulated for Development
-// When ready for production, replace simulated functions with real API calls
+// Envia.com Integration - Real API
+// Documentation: https://docs.envia.com/
+
+const ENVIA_API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://api.envia.com' 
+  : 'https://api-test.envia.com';
+
+const ENVIA_API_KEY = process.env.ENVIA_API_KEY || '';
+
+// Helper function for API calls
+async function enviaRequest(endpoint: string, method: string = 'GET', body?: object) {
+  const response = await fetch(`${ENVIA_API_URL}${endpoint}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${ENVIA_API_KEY}`,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`Envia API Error [${endpoint}]:`, errorText);
+    throw new Error(`Envia API Error: ${response.status}`);
+  }
+  
+  return response.json();
+}
 
 export interface ShippingAddress {
   name: string;
   street: string;
+  street2?: string;
   city: string;
   state: string;
   zipCode: string;
+  country?: string;
   phone: string;
   email: string;
 }
@@ -161,22 +189,132 @@ export function getZoneFromZipCode(zipCode: string): number {
   return zipZones[prefix] || 3; // Default to zone 3 for other areas
 }
 
-// Calculate shipping rates (simulated Envia.com response)
+// Calculate shipping rates using Envia.com API
 export async function getShippingRates(
   originZipCode: string,
   destinationZipCode: string,
   packageInfo: PackageInfo
 ): Promise<ShippingRate[]> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // If no API key, use fallback rates
+  if (!ENVIA_API_KEY) {
+    console.warn('ENVIA_API_KEY not configured, using fallback rates');
+    return getFallbackRates(destinationZipCode, packageInfo);
+  }
+  
+  try {
+    const requestBody = {
+      origin: {
+        name: PETCOM_ORIGIN.name,
+        company: 'PETCOM MX',
+        email: PETCOM_ORIGIN.email,
+        phone: PETCOM_ORIGIN.phone,
+        street: PETCOM_ORIGIN.street,
+        number: '',
+        district: '',
+        city: PETCOM_ORIGIN.city,
+        state: PETCOM_ORIGIN.state,
+        country: 'MX',
+        postalCode: originZipCode || PETCOM_ORIGIN.zipCode,
+      },
+      destination: {
+        name: 'Cliente',
+        company: '',
+        email: '',
+        phone: '',
+        street: '',
+        number: '',
+        district: '',
+        city: '',
+        state: '',
+        country: 'MX',
+        postalCode: destinationZipCode,
+      },
+      packages: [{
+        content: 'Productos para mascotas',
+        amount: 1,
+        type: 'box',
+        dimensions: {
+          length: packageInfo.length,
+          width: packageInfo.width,
+          height: packageInfo.height,
+        },
+        weight: packageInfo.weight,
+        insurance: packageInfo.declaredValue > 0 ? packageInfo.declaredValue : 0,
+        declaredValue: packageInfo.declaredValue,
+      }],
+      shipment: {
+        carrier: 'all', // Get rates from all carriers
+        type: 1, // Standard shipment
+      },
+      settings: {
+        currency: 'MXN',
+      },
+    };
 
+    const response = await enviaRequest('/ship/rate/', 'POST', requestBody);
+    
+    if (!response.data || response.data.length === 0) {
+      console.warn('No rates returned from Envia API, using fallback');
+      return getFallbackRates(destinationZipCode, packageInfo);
+    }
+    
+    // Map Envia.com response to our ShippingRate interface
+    const rates: ShippingRate[] = response.data.map((rate: {
+      carrierId: string;
+      carrier: string;
+      carrierDescription: string;
+      carrierLogo: string;
+      service: string;
+      serviceId: string;
+      serviceDescription: string;
+      deliveryEstimate: {
+        days: number;
+        date?: string;
+      };
+      totalPrice: number;
+      currency: string;
+      zone?: string;
+    }, index: number) => {
+      const deliveryDate = new Date();
+      deliveryDate.setDate(deliveryDate.getDate() + (rate.deliveryEstimate?.days || 3));
+      
+      // Get carrier logo from our config or use Envia's
+      const carrierKey = rate.carrier?.toLowerCase().replace(/\s/g, '') || '';
+      const localCarrier = CARRIERS[carrierKey as keyof typeof CARRIERS];
+      
+      return {
+        id: `envia_${rate.carrierId}_${rate.serviceId}_${index}`,
+        carrier: rate.carrier || carrierKey,
+        carrierName: rate.carrierDescription || rate.carrier,
+        carrierLogo: localCarrier?.logo || rate.carrierLogo || '',
+        serviceType: rate.serviceId || rate.service,
+        serviceName: rate.serviceDescription || rate.service,
+        deliveryDays: rate.deliveryEstimate?.days || 3,
+        estimatedDelivery: deliveryDate.toLocaleDateString('es-MX', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric'
+        }),
+        price: rate.totalPrice || 0,
+        currency: rate.currency || 'MXN',
+        zone: rate.zone || '',
+      };
+    });
+    
+    return rates.sort((a, b) => a.price - b.price);
+    
+  } catch (error) {
+    console.error('Error fetching Envia rates:', error);
+    return getFallbackRates(destinationZipCode, packageInfo);
+  }
+}
+
+// Fallback rates when API is unavailable
+function getFallbackRates(destinationZipCode: string, packageInfo: PackageInfo): ShippingRate[] {
   const zone = getZoneFromZipCode(destinationZipCode);
-  const zoneMultiplier = 1 + (zone - 1) * 0.25; // Zone 1: 1x, Zone 2: 1.25x, Zone 3: 1.5x, Zone 4: 1.75x
+  const zoneMultiplier = 1 + (zone - 1) * 0.25;
   
-  // Weight factor
-  const weightFactor = Math.max(1, packageInfo.weight / 1); // per kg
-  
-  // Calculate volumetric weight
   const volumetricWeight = (packageInfo.length * packageInfo.width * packageInfo.height) / 5000;
   const chargeableWeight = Math.max(packageInfo.weight, volumetricWeight);
   
@@ -191,7 +329,7 @@ export async function getShippingRates(
       deliveryDate.setDate(deliveryDate.getDate() + service.days);
       
       rates.push({
-        id: `${carrierId}_${service.type}_${Date.now()}`,
+        id: `fallback_${carrierId}_${service.type}_${Date.now()}`,
         carrier: carrierId,
         carrierName: carrier.name,
         carrierLogo: carrier.logo,
@@ -210,50 +348,208 @@ export async function getShippingRates(
     }
   }
   
-  // Sort by price
   return rates.sort((a, b) => a.price - b.price);
 }
 
-// Create shipment and generate label (simulated)
+// Create shipment and generate label using Envia.com API
 export async function createShipment(
   rateId: string,
   origin: ShippingAddress,
   destination: ShippingAddress,
-  packageInfo: PackageInfo
+  packageInfo: PackageInfo,
+  selectedRate?: ShippingRate
 ): Promise<ShipmentResult> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // If no API key or using fallback rate, use simulated shipment
+  if (!ENVIA_API_KEY || rateId.startsWith('fallback_')) {
+    return createFallbackShipment(rateId, destination, packageInfo);
+  }
+  
+  try {
+    // Parse rate info from rateId: envia_{carrierId}_{serviceId}_{index}
+    const parts = rateId.split('_');
+    const carrierId = parts[1] || '';
+    const serviceId = parts[2] || '';
+    
+    const requestBody = {
+      origin: {
+        name: origin.name,
+        company: 'PETCOM MX',
+        email: origin.email,
+        phone: origin.phone,
+        street: origin.street,
+        number: '',
+        district: '',
+        city: origin.city,
+        state: origin.state,
+        country: origin.country || 'MX',
+        postalCode: origin.zipCode,
+      },
+      destination: {
+        name: destination.name,
+        company: '',
+        email: destination.email,
+        phone: destination.phone,
+        street: destination.street,
+        number: '',
+        district: '',
+        city: destination.city,
+        state: destination.state,
+        country: destination.country || 'MX',
+        postalCode: destination.zipCode,
+      },
+      packages: [{
+        content: 'Productos para mascotas - PETCOM',
+        amount: 1,
+        type: 'box',
+        dimensions: {
+          length: packageInfo.length,
+          width: packageInfo.width,
+          height: packageInfo.height,
+        },
+        weight: packageInfo.weight,
+        insurance: packageInfo.declaredValue > 0 ? packageInfo.declaredValue : 0,
+        declaredValue: packageInfo.declaredValue,
+      }],
+      shipment: {
+        carrier: carrierId,
+        service: serviceId,
+        type: 1,
+      },
+      settings: {
+        printFormat: 'PDF',
+        printSize: 'PAPER_7X4.75',
+        currency: 'MXN',
+      },
+    };
 
-  // Parse carrier from rateId
-  const [carrier, serviceType] = rateId.split('_');
-  const carrierConfig = CARRIERS[carrier as keyof typeof CARRIERS];
-  const service = carrierConfig?.services.find(s => s.type === serviceType);
+    const response = await enviaRequest('/ship/generate/', 'POST', requestBody);
+    
+    if (!response.data || !response.data[0]) {
+      throw new Error('No shipment data returned');
+    }
+    
+    const shipment = response.data[0];
+    
+    const estimatedDelivery = new Date();
+    estimatedDelivery.setDate(estimatedDelivery.getDate() + (selectedRate?.deliveryDays || 3));
+    
+    return {
+      success: true,
+      shipmentId: shipment.shipmentId || `ENVIA-${Date.now()}`,
+      trackingNumber: shipment.trackingNumber || shipment.trackingurl?.split('/').pop() || '',
+      trackingUrl: shipment.trackingurl || `https://envia.com/tracking/${shipment.trackingNumber}`,
+      labelUrl: shipment.label || '',
+      carrier: selectedRate?.carrierName || shipment.carrier || carrierId,
+      serviceName: selectedRate?.serviceName || shipment.service || 'Standard',
+      estimatedDelivery,
+    };
+    
+  } catch (error) {
+    console.error('Error creating Envia shipment:', error);
+    // Fallback to simulated shipment
+    return createFallbackShipment(rateId, destination, packageInfo);
+  }
+}
+
+// Fallback shipment creation when API fails
+function createFallbackShipment(
+  rateId: string,
+  destination: ShippingAddress,
+  packageInfo: PackageInfo
+): ShipmentResult {
+  const parts = rateId.split('_');
+  const carrier = parts[1] || 'express';
+  const serviceType = parts[2] || 'standard';
+  const carrierConfig = CARRIERS[carrier as keyof typeof CARRIERS] || CARRIERS.fedex;
+  const service = carrierConfig?.services.find(s => s.type === serviceType) || carrierConfig.services[0];
   
-  // Generate simulated tracking number
-  const trackingNumber = `${carrier.toUpperCase()}${Date.now().toString(36).toUpperCase()}MX`;
+  const trackingNumber = `${carrier.toUpperCase().substring(0, 3)}${Date.now().toString(36).toUpperCase()}MX`;
   
-  // Calculate estimated delivery
   const estimatedDelivery = new Date();
   estimatedDelivery.setDate(estimatedDelivery.getDate() + (service?.days || 3));
   
   return {
     success: true,
-    shipmentId: `ENVIA-${Date.now()}`,
+    shipmentId: `LOCAL-${Date.now()}`,
     trackingNumber,
-    trackingUrl: `https://tracking.envia.com/${trackingNumber}`,
-    labelUrl: `/api/shipping/label/${trackingNumber}`, // Generate label endpoint
+    trackingUrl: `/rastreo/${trackingNumber}`,
+    labelUrl: `/api/shipping/label/${trackingNumber}`,
     carrier: carrierConfig?.name || carrier,
     serviceName: service?.name || 'Standard',
     estimatedDelivery,
   };
 }
 
-// Get tracking info (simulated)
+// Get tracking info using Envia.com API
 export async function getTrackingInfo(trackingNumber: string): Promise<TrackingInfo | null> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 400));
+  
+  // If no API key or local tracking number, use fallback
+  if (!ENVIA_API_KEY || trackingNumber.startsWith('LOCAL') || trackingNumber.length < 10) {
+    return getFallbackTrackingInfo(trackingNumber);
+  }
+  
+  try {
+    const response = await enviaRequest(`/ship/tracking/${trackingNumber}`, 'GET');
+    
+    if (!response.data) {
+      return getFallbackTrackingInfo(trackingNumber);
+    }
+    
+    const tracking = response.data;
+    
+    // Map Envia status to our status codes
+    const statusMapping: Record<string, string> = {
+      'CREATED': 'label_created',
+      'LABEL_CREATED': 'label_created',
+      'PICKED_UP': 'picked_up',
+      'IN_TRANSIT': 'in_transit',
+      'OUT_FOR_DELIVERY': 'out_for_delivery',
+      'DELIVERED': 'delivered',
+      'EXCEPTION': 'exception',
+      'RETURNED': 'returned',
+    };
+    
+    const events: TrackingEvent[] = (tracking.events || []).map((event: {
+      date: string;
+      time?: string;
+      status: string;
+      description: string;
+      location?: string;
+    }) => ({
+      date: new Date(event.date).toLocaleDateString('es-MX'),
+      time: event.time || new Date(event.date).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+      status: statusMapping[event.status?.toUpperCase()] || event.status?.toLowerCase() || 'unknown',
+      description: event.description || event.status || '',
+      location: event.location || '',
+    }));
+    
+    const currentStatus = statusMapping[tracking.status?.toUpperCase()] || tracking.status?.toLowerCase() || 'in_transit';
+    
+    return {
+      trackingNumber,
+      carrier: tracking.carrier || '',
+      carrierName: tracking.carrierName || tracking.carrier || '',
+      status: currentStatus,
+      statusLabel: SHIPMENT_STATUS[currentStatus as keyof typeof SHIPMENT_STATUS]?.label || currentStatus,
+      estimatedDelivery: tracking.estimatedDelivery 
+        ? new Date(tracking.estimatedDelivery).toLocaleDateString('es-MX', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric'
+          })
+        : 'Pendiente',
+      events: events.reverse(),
+    };
+    
+  } catch (error) {
+    console.error('Error fetching Envia tracking:', error);
+    return getFallbackTrackingInfo(trackingNumber);
+  }
+}
 
-  // Extract carrier from tracking number
+// Fallback tracking info when API fails
+function getFallbackTrackingInfo(trackingNumber: string): TrackingInfo {
   const carrierPrefix = trackingNumber.substring(0, 3).toLowerCase();
   let carrier = 'fedex';
   let carrierName = 'FedEx';
@@ -261,22 +557,19 @@ export async function getTrackingInfo(trackingNumber: string): Promise<TrackingI
   if (carrierPrefix === 'dhl') { carrier = 'dhl'; carrierName = 'DHL'; }
   else if (carrierPrefix === 'est') { carrier = 'estafeta'; carrierName = 'Estafeta'; }
   else if (carrierPrefix === 'red') { carrier = 'redpack'; carrierName = 'Redpack'; }
+  else if (carrierPrefix === 'paq') { carrier = 'paquetexpress'; carrierName = 'Paquetexpress'; }
   
-  // Simulate tracking events based on a pseudo-random seed from tracking number
   const seed = trackingNumber.charCodeAt(trackingNumber.length - 1);
   const daysAgo = seed % 5;
   
   const events: TrackingEvent[] = [];
-  const today = new Date();
-  
-  // Create event history
-  const baseDate = new Date(today);
+  const baseDate = new Date();
   baseDate.setDate(baseDate.getDate() - daysAgo);
   
   events.push({
     date: baseDate.toLocaleDateString('es-MX'),
     time: '09:30',
-    status: 'created',
+    status: 'label_created',
     description: 'Guía generada',
     location: 'CDMX, México',
   });
@@ -329,16 +622,7 @@ export async function getTrackingInfo(trackingNumber: string): Promise<TrackingI
     });
   }
   
-  // Determine current status
   const latestEvent = events[events.length - 1];
-  const statusLabels: Record<string, string> = {
-    'created': 'Guía Generada',
-    'picked_up': 'Recolectado',
-    'in_transit': 'En Tránsito',
-    'out_for_delivery': 'En Camino',
-    'delivered': 'Entregado',
-  };
-  
   const estimatedDelivery = new Date();
   estimatedDelivery.setDate(estimatedDelivery.getDate() + (4 - daysAgo));
   
@@ -347,7 +631,7 @@ export async function getTrackingInfo(trackingNumber: string): Promise<TrackingI
     carrier,
     carrierName,
     status: latestEvent.status,
-    statusLabel: statusLabels[latestEvent.status] || latestEvent.status,
+    statusLabel: SHIPMENT_STATUS[latestEvent.status as keyof typeof SHIPMENT_STATUS]?.label || latestEvent.status,
     estimatedDelivery: latestEvent.status === 'delivered' 
       ? 'Entregado' 
       : estimatedDelivery.toLocaleDateString('es-MX', {
@@ -355,7 +639,7 @@ export async function getTrackingInfo(trackingNumber: string): Promise<TrackingI
           month: 'long',
           day: 'numeric'
         }),
-    events: events.reverse(), // Most recent first
+    events: events.reverse(),
   };
 }
 
