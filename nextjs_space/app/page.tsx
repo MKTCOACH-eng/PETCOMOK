@@ -533,20 +533,20 @@ export default async function HomePage() {
           <source src="https://videos.pexels.com/video-files/9400102/9400102-hd_1920_1080_30fps.mp4" type="video/mp4" />
         </video>
         
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#7baaf7]/90 to-[#ba67c8]/90" />
+        {/* Overlay - más transparente para ver el video */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#7baaf7]/60 via-[#9b8ac7]/50 to-[#ba67c8]/60" />
         
         {/* Content */}
         <div className="relative z-10 max-w-[1200px] mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-lg">
             Tu mascota merece lo mejor
           </h2>
-          <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-white text-lg mb-8 max-w-2xl mx-auto drop-shadow-md">
             Únete a miles de familias que confían en nosotros para el cuidado diario de sus compañeros.
           </p>
           <Link
             href="/catalogo"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#7baaf7] font-bold rounded-full hover:bg-gray-100 transition-colors shadow-xl hover:scale-105"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#7baaf7] font-bold rounded-full hover:bg-gray-100 transition-all shadow-xl hover:scale-105"
           >
             Empezar a explorar
             <ArrowRight className="w-5 h-5" />

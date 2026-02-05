@@ -125,7 +125,8 @@ export function Footer() {
               <li><Link href="/catalogo" className="text-gray-600 hover:text-[#7baaf7] text-sm">Catálogo</Link></li>
               <li><Link href="/catalogo?category=perros" className="text-gray-600 hover:text-[#7baaf7] text-sm">Perros</Link></li>
               <li><Link href="/catalogo?category=gatos" className="text-gray-600 hover:text-[#7baaf7] text-sm">Gatos</Link></li>
-              <li><Link href="/catalogo?category=accesorios" className="text-gray-600 hover:text-[#7baaf7] text-sm">Accesorios</Link></li>
+              <li><Link href="/catalogo?category=mascotas-pequenas" className="text-gray-600 hover:text-[#7baaf7] text-sm">Mascotas Pequeñas</Link></li>
+              <li><Link href="/catalogo?category=aves" className="text-gray-600 hover:text-[#7baaf7] text-sm">Aves</Link></li>
             </ul>
           </div>
 
