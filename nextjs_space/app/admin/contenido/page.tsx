@@ -241,9 +241,14 @@ export default async function ContenidoPage({ searchParams }: PageProps) {
                     {/* Status & Actions */}
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        article.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                        article.published ? 'bg-green-100 text-green-700' : 
+                        article.publishAt && new Date(article.publishAt) > new Date() ? 'bg-amber-100 text-amber-700' :
+                        'bg-gray-100 text-gray-600'
                       }`}>
-                        {article.published ? 'Publicado' : 'Borrador'}
+                        {article.published ? 'Publicado' : 
+                         article.publishAt && new Date(article.publishAt) > new Date() ? 
+                           `📅 ${new Date(article.publishAt).toLocaleDateString('es-MX')}` : 
+                           'Borrador'}
                       </span>
                       <Link
                         href={`/admin/contenido/${article.id}`}

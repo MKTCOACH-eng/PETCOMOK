@@ -42,17 +42,30 @@ interface PageProps {
 
 export default async function BlogPage({ searchParams }: PageProps) {
   const { type, category, pet, q } = searchParams;
+  const now = new Date();
 
-  // Build filter
-  const where: any = { published: true };
+  // Build filter - include published OR scheduled articles that have reached their publish date
+  const baseFilter: any = {
+    OR: [
+      { published: true },
+      { publishAt: { lte: now } }
+    ]
+  };
+  
+  const where: any = { ...baseFilter };
   if (type) where.contentType = type;
   if (category) where.category = category;
   if (pet) where.petType = pet;
   if (q) {
-    where.OR = [
-      { title: { contains: q, mode: 'insensitive' } },
-      { excerpt: { contains: q, mode: 'insensitive' } },
-      { content: { contains: q, mode: 'insensitive' } }
+    where.AND = [
+      baseFilter,
+      {
+        OR: [
+          { title: { contains: q, mode: 'insensitive' } },
+          { excerpt: { contains: q, mode: 'insensitive' } },
+          { content: { contains: q, mode: 'insensitive' } }
+        ]
+      }
     ];
   }
 

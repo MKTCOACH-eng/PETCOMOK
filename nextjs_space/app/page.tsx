@@ -554,52 +554,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Decorative Animal Paws Divider */}
-      <div className="relative h-24 bg-gradient-to-b from-[#ba67c8]/90 to-[#7baaf7]">
-        <div className="absolute inset-0 flex items-center justify-center gap-6 md:gap-12">
-          {/* Dog Paw */}
-          <svg className="w-12 h-12 md:w-16 md:h-16 text-white/80 transform -rotate-12" viewBox="0 0 64 64" fill="currentColor">
-            <ellipse cx="32" cy="42" rx="12" ry="14" />
-            <ellipse cx="18" cy="24" rx="6" ry="7" />
-            <ellipse cx="32" cy="18" rx="5" ry="6" />
-            <ellipse cx="46" cy="24" rx="6" ry="7" />
-          </svg>
-          
-          {/* Cat Paw */}
-          <svg className="w-10 h-10 md:w-14 md:h-14 text-white/70 transform rotate-6" viewBox="0 0 64 64" fill="currentColor">
-            <ellipse cx="32" cy="44" rx="10" ry="12" />
-            <ellipse cx="20" cy="28" rx="5" ry="6" />
-            <ellipse cx="32" cy="22" rx="4" ry="5" />
-            <ellipse cx="44" cy="28" rx="5" ry="6" />
-          </svg>
-          
-          {/* Bird Footprint */}
-          <svg className="w-10 h-10 md:w-14 md:h-14 text-white/75 transform -rotate-6" viewBox="0 0 64 64" fill="currentColor">
-            <path d="M32 8 L32 32 L28 28 L32 32 L36 28 L32 32 L32 56" strokeWidth="4" stroke="currentColor" fill="none" strokeLinecap="round" />
-            <path d="M22 36 L32 32 L42 36" strokeWidth="4" stroke="currentColor" fill="none" strokeLinecap="round" />
-            <path d="M20 48 L32 40 L44 48" strokeWidth="4" stroke="currentColor" fill="none" strokeLinecap="round" />
-          </svg>
-          
-          {/* Rabbit Paw */}
-          <svg className="w-10 h-10 md:w-14 md:h-14 text-white/70 transform rotate-12" viewBox="0 0 64 64" fill="currentColor">
-            <ellipse cx="32" cy="46" rx="8" ry="12" />
-            <ellipse cx="22" cy="30" rx="4" ry="6" />
-            <ellipse cx="32" cy="26" rx="3" ry="5" />
-            <ellipse cx="42" cy="30" rx="4" ry="6" />
-          </svg>
-          
-          {/* Frog Footprint */}
-          <svg className="w-10 h-10 md:w-14 md:h-14 text-white/80 transform -rotate-3" viewBox="0 0 64 64" fill="currentColor">
-            <ellipse cx="32" cy="48" rx="6" ry="8" />
-            <ellipse cx="20" cy="36" rx="4" ry="10" />
-            <ellipse cx="32" cy="32" rx="3" ry="10" />
-            <ellipse cx="44" cy="36" rx="4" ry="10" />
-            <circle cx="20" cy="24" r="3" />
-            <circle cx="32" cy="20" r="3" />
-            <circle cx="44" cy="24" r="3" />
-          </svg>
-        </div>
-      </div>
+
     </div>
   );
 }

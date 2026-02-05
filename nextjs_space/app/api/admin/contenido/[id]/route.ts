@@ -58,6 +58,10 @@ export async function PUT(
         relatedProducts: data.relatedProducts || [],
         featured: data.featured,
         published: data.published,
+        // SEO and scheduling fields
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
+        publishAt: data.publishAt ? new Date(data.publishAt) : null,
         updatedAt: new Date()
       }
     });

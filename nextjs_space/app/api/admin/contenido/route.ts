@@ -63,6 +63,10 @@ export async function POST(request: NextRequest) {
         relatedProducts: data.relatedProducts || [],
         featured: data.featured || false,
         published: data.published || false,
+        // New SEO and scheduling fields
+        metaTitle: data.metaTitle || null,
+        metaDescription: data.metaDescription || null,
+        publishAt: data.publishAt ? new Date(data.publishAt) : null,
       }
     });
 

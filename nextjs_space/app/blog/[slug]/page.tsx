@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import prisma from '@/lib/db';
+import { Metadata } from 'next';
 import { 
   ArrowLeft, 
   Clock, 
@@ -17,6 +18,34 @@ import {
 import { ProductCard } from '@/components/product-card';
 
 export const dynamic = 'force-dynamic';
+
+// Generate metadata for SEO
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const article = await prisma.article.findUnique({
+    where: { slug: params.slug }
+  });
+
+  if (!article) {
+    return { title: 'Artículo no encontrado | PETCOM' };
+  }
+
+  return {
+    title: article.metaTitle || article.title + ' | PETCOM Blog',
+    description: article.metaDescription || article.excerpt || 'Lee este artículo en el blog de PETCOM',
+    openGraph: {
+      title: article.metaTitle || article.title,
+      description: article.metaDescription || article.excerpt || '',
+      images: article.imageUrl ? [article.imageUrl] : [],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.metaTitle || article.title,
+      description: article.metaDescription || article.excerpt || '',
+      images: article.imageUrl ? [article.imageUrl] : [],
+    }
+  };
+}
 
 const contentTypeLabels: Record<string, string> = {
   article: 'Artículo',
@@ -49,7 +78,11 @@ export default async function ArticlePage({ params }: PageProps) {
     where: { slug: params.slug }
   });
 
-  if (!article || !article.published) {
+  // Check if article is published or scheduled to publish
+  const isPublished = article?.published || 
+    (article?.publishAt && new Date(article.publishAt) <= new Date());
+  
+  if (!article || !isPublished) {
     notFound();
   }
 
