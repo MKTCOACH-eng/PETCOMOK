@@ -380,6 +380,23 @@ async function main() {
     console.log(`📝 Created article: ${article.title}`);
   }
 
+  // Create service categories
+  const serviceCategories = [
+    { name: 'Veterinarios', slug: 'veterinarios', description: 'Clínicas y consultorios veterinarios', icon: 'Stethoscope', order: 1 },
+    { name: 'Estéticas', slug: 'esteticas', description: 'Grooming y estética canina y felina', icon: 'Scissors', order: 2 },
+    { name: 'Entrenadores', slug: 'entrenadores', description: 'Entrenamiento y adiestramiento', icon: 'GraduationCap', order: 3 },
+    { name: 'Hospedaje', slug: 'hospedaje', description: 'Hoteles y guarderías para mascotas', icon: 'Home', order: 4 },
+    { name: 'Paseadores', slug: 'paseadores', description: 'Servicios de paseo y cuidado', icon: 'Dog', order: 5 },
+  ];
+
+  for (const cat of serviceCategories) {
+    const existing = await prisma.serviceCategory.findUnique({ where: { slug: cat.slug } });
+    if (!existing) {
+      await prisma.serviceCategory.create({ data: cat });
+      console.log(`🏥 Created service category: ${cat.name}`);
+    }
+  }
+
   console.log('✅ Seed completed successfully!');
 }
 

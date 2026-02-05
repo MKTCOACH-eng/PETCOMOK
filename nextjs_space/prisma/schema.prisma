@@ -292,3 +292,167 @@ model Subscriber {
   @@index([email])
   @@index([isActive])
 }
+
+// ========================================
+// MÓDULO DE PROVEEDORES DE SERVICIOS
+// ========================================
+
+model ServiceCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String?  // lucide icon name
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  providers ServiceProvider[]
+
+  @@map("service_categories")
+  @@index([slug])
+  @@index([isActive])
+}
+
+model ServiceProvider {
+  id              String   @id @default(cuid())
+  
+  // Datos básicos
+  businessName    String
+  slug            String   @unique
+  description     String   @db.Text
+  shortDescription String?
+  logoUrl         String?
+  coverImageUrl   String?
+  images          String[] @default([])
+  
+  // Categoría
+  categoryId      String
+  
+  // Ubicación
+  address         String?
+  city            String?
+  state           String?
+  zipCode         String?
+  latitude        Float?
+  longitude       Float?
+  serviceArea     String?  // "CDMX y Zona Metropolitana"
+  
+  // Contacto
+  contactName     String
+  email           String
+  phone           String
+  whatsapp        String?
+  website         String?
+  facebook        String?
+  instagram       String?
+  
+  // Membresía
+  membershipStatus  String   @default("pending") // pending, active, expired, cancelled
+  membershipPrice   Float    @default(299)
+  membershipStartDate DateTime?
+  membershipEndDate   DateTime?
+  stripeSubscriptionId String?
+  
+  // Estadísticas y ranking
+  totalLeads      Int      @default(0)
+  totalViews      Int      @default(0)
+  totalReviews    Int      @default(0)
+  averageRating   Float    @default(0)
+  featured        Boolean  @default(false)
+  
+  // Servicios ofrecidos (JSON array)
+  services        Json     @default("[]") // [{name, description, price, duration}]
+  
+  // Horarios
+  schedule        Json     @default("{}") // {monday: {open: "09:00", close: "18:00"}, ...}
+  
+  // Estado
+  isApproved      Boolean  @default(false)
+  isActive        Boolean  @default(true)
+  approvedAt      DateTime?
+  approvedBy      String?
+  rejectionReason String?
+  
+  // Auth
+  password        String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  category ServiceCategory @relation(fields: [categoryId], references: [id])
+  leads    ServiceLead[]
+  reviews  ServiceReview[]
+
+  @@map("service_providers")
+  @@index([categoryId])
+  @@index([slug])
+  @@index([membershipStatus])
+  @@index([isApproved])
+  @@index([averageRating])
+  @@index([totalLeads])
+}
+
+model ServiceLead {
+  id              String   @id @default(cuid())
+  providerId      String
+  
+  // Datos del cliente interesado
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  petType         String?  // perro, gato, etc.
+  petName         String?
+  message         String?  @db.Text
+  
+  // Servicio de interés
+  serviceInterest String?
+  
+  // Estado
+  status          String   @default("new") // new, contacted, converted, lost
+  notes           String?  @db.Text
+  
+  // Tracking
+  source          String   @default("web") // web, whatsapp, phone
+  viewedAt        DateTime?
+  contactedAt     DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  provider ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@map("service_leads")
+  @@index([providerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ServiceReview {
+  id              String   @id @default(cuid())
+  providerId      String
+  
+  // Autor
+  authorName      String
+  authorEmail     String?
+  
+  // Review
+  rating          Int      // 1-5
+  title           String?
+  comment         String   @db.Text
+  
+  // Moderación
+  isApproved      Boolean  @default(false)
+  isVisible       Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  provider ServiceProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@map("service_reviews")
+  @@index([providerId])
+  @@index([isApproved])
+  @@index([rating])
+}

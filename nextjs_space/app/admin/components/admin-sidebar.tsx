@@ -17,7 +17,8 @@ import {
   Ticket,
   Megaphone,
   FileText,
-  Globe
+  Globe,
+  Stethoscope
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
@@ -28,6 +29,7 @@ const navigation = [
   { name: 'Dropshipping', href: '/admin/dropshipping', icon: Globe },
   { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
   { name: 'Envíos', href: '/admin/envios', icon: Truck },
+  { name: 'Servicios', href: '/admin/servicios', icon: Stethoscope },
   { name: 'Clientes', href: '/admin/clientes', icon: Users },
   { name: 'Blog & Tips', href: '/admin/contenido', icon: FileText },
   { name: 'Marketing', href: '/admin/marketing', icon: Megaphone },

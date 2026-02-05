@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Truck, Shield, Heart, Play, Lightbulb, FileText, Eye } from 'lucide-react';
+import { ArrowRight, Truck, Shield, Heart, Play, Lightbulb, FileText, Eye, Star, MapPin, Stethoscope, Scissors, GraduationCap, Home as HomeIcon, Dog } from 'lucide-react';
 import prisma from '@/lib/db';
 import { ProductCard } from '@/components/product-card';
 import { PersonalizedRecommendations } from '@/components/personalized-recommendations';
@@ -26,6 +26,23 @@ interface Article {
   petType: string | null;
   viewCount: number;
   createdAt: Date;
+}
+
+interface ServiceProvider {
+  id: string;
+  businessName: string;
+  slug: string;
+  shortDescription: string | null;
+  logoUrl: string | null;
+  city: string | null;
+  averageRating: number;
+  totalReviews: number;
+  totalLeads: number;
+  category: {
+    name: string;
+    slug: string;
+    icon: string | null;
+  };
 }
 
 const CATEGORIES = [
@@ -67,6 +84,41 @@ async function getLatestArticles() {
   });
 }
 
+async function getTopServiceProviders() {
+  return prisma.serviceProvider.findMany({
+    where: {
+      isApproved: true,
+      isActive: true,
+      membershipStatus: 'active'
+    },
+    orderBy: [
+      { featured: 'desc' },
+      { averageRating: 'desc' },
+      { totalLeads: 'desc' }
+    ],
+    take: 3,
+    include: {
+      category: true
+    }
+  });
+}
+
+async function getServiceCategories() {
+  return prisma.serviceCategory.findMany({
+    where: { isActive: true },
+    orderBy: { order: 'asc' },
+    take: 5
+  });
+}
+
+const serviceCategoryIcons: Record<string, React.ReactNode> = {
+  veterinarios: <Stethoscope className="w-5 h-5" />,
+  esteticas: <Scissors className="w-5 h-5" />,
+  entrenadores: <GraduationCap className="w-5 h-5" />,
+  hospedaje: <HomeIcon className="w-5 h-5" />,
+  paseadores: <Dog className="w-5 h-5" />,
+};
+
 const contentTypeIcons: Record<string, React.ReactNode> = {
   video: <Play className="w-4 h-4" />,
   tip: <Lightbulb className="w-4 h-4" />,
@@ -91,6 +143,8 @@ const categoryLabels: Record<string, string> = {
 export default async function HomePage() {
   const products = await getFeaturedProducts();
   const articles = await getLatestArticles();
+  const serviceProviders = await getTopServiceProviders();
+  const serviceCategories = await getServiceCategories();
 
   return (
     <div className="min-h-screen">
@@ -296,6 +350,148 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Services Section - Top 3 Providers */}
+      <section className="py-16 bg-white">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Servicios para tu Mascota</h2>
+              <p className="text-gray-600">Encuentra los mejores profesionales cerca de ti</p>
+            </div>
+            <Link
+              href="/servicios"
+              className="hidden md:inline-flex items-center gap-2 px-4 py-2 text-[#7baaf7] hover:bg-[#7baaf7]/10 rounded-lg font-medium transition-colors"
+            >
+              Ver todos
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Service Categories Quick Filter */}
+          {serviceCategories.length > 0 && (
+            <div className="flex flex-wrap gap-3 mb-8">
+              {serviceCategories.map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/servicios?categoria=${cat.slug}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-[#7baaf7]/10 hover:text-[#7baaf7] rounded-full text-sm font-medium transition-colors"
+                >
+                  {serviceCategoryIcons[cat.slug] || <Star className="w-4 h-4" />}
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Top 3 Service Providers */}
+          {serviceProviders.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {serviceProviders.map((provider: ServiceProvider, index: number) => (
+                <Link
+                  key={provider.id}
+                  href={`/servicios/${provider.slug}`}
+                  className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300"
+                >
+                  {/* Top Badge */}
+                  {index === 0 && (
+                    <div className="absolute top-3 left-3 z-10 px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold rounded-full flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-current" />
+                      Más Solicitado
+                    </div>
+                  )}
+
+                  {/* Provider Image/Logo */}
+                  <div className="relative h-40 bg-gradient-to-br from-[#7baaf7]/20 to-[#ba67c8]/20 flex items-center justify-center">
+                    {provider.logoUrl ? (
+                      <Image
+                        src={provider.logoUrl}
+                        alt={provider.businessName}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center">
+                        {serviceCategoryIcons[provider.category.slug] || <Stethoscope className="w-10 h-10 text-[#7baaf7]" />}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-5">
+                    {/* Category Badge */}
+                    <span className="inline-block px-2 py-1 bg-[#7baaf7]/10 text-[#7baaf7] text-xs font-medium rounded-full mb-3">
+                      {provider.category.name}
+                    </span>
+
+                    <h3 className="font-bold text-gray-900 text-lg group-hover:text-[#7baaf7] transition-colors mb-2">
+                      {provider.businessName}
+                    </h3>
+
+                    {provider.shortDescription && (
+                      <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                        {provider.shortDescription}
+                      </p>
+                    )}
+
+                    {/* Rating & Location */}
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-amber-500 fill-current" />
+                        <span className="font-medium text-gray-900">{provider.averageRating.toFixed(1)}</span>
+                        <span className="text-gray-500">({provider.totalReviews})</span>
+                      </div>
+                      {provider.city && (
+                        <div className="flex items-center gap-1 text-gray-500">
+                          <MapPin className="w-4 h-4" />
+                          <span>{provider.city}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <Stethoscope className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Próximamente</h3>
+              <p className="text-gray-600 mb-4">Estamos incorporando los mejores profesionales para tu mascota</p>
+              <Link
+                href="/proveedor/registro"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#7baaf7] text-white rounded-lg font-medium hover:bg-[#6a9be6] transition-colors"
+              >
+                ¿Eres profesional? Únete aquí
+              </Link>
+            </div>
+          )}
+
+          {/* CTA for Providers */}
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-gradient-to-r from-[#7baaf7]/10 to-[#ba67c8]/10 rounded-xl">
+            <div>
+              <h3 className="font-bold text-gray-900 mb-1">¿Ofreces servicios para mascotas?</h3>
+              <p className="text-gray-600 text-sm">Únete a PETCOM y recibe clientes desde $299/mes</p>
+            </div>
+            <Link
+              href="/proveedor/registro"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#7baaf7] text-white rounded-lg font-medium hover:bg-[#6a9be6] transition-colors whitespace-nowrap"
+            >
+              Registrar mi negocio
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="mt-6 text-center md:hidden">
+            <Link
+              href="/servicios"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#7baaf7] text-white rounded-lg font-medium"
+            >
+              Ver todos los servicios
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Features Section */}
       <section className="py-16 bg-[#F7F8FA]">
