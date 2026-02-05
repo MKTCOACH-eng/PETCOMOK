@@ -199,7 +199,7 @@ export default async function HomePage() {
 
       {/* CTA Section with Video Background */}
       <section className="relative py-24 overflow-hidden">
-        {/* Video Background */}
+        {/* Video Background - Cute pets */}
         <video
           autoPlay
           loop
@@ -207,7 +207,7 @@ export default async function HomePage() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/Hero_video/202602040234.mp4" type="video/mp4" />
+          <source src="https://videos.pexels.com/video-files/9400102/9400102-hd_1920_1080_30fps.mp4" type="video/mp4" />
         </video>
         
         {/* Overlay */}

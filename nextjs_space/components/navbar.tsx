@@ -31,14 +31,14 @@ export function Navbar() {
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
       <div className="max-w-[1200px] mx-auto px-4">
         <nav className="flex items-center justify-between h-16">
-          {/* Logo - Solo favicon */}
+          {/* Logo - Solo favicon con fondo transparente */}
           <Link href="/" className="flex items-center">
-            <div className="relative w-12 h-12">
+            <div className="relative w-11 h-11 rounded-lg overflow-hidden">
               <Image
                 src="https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/LOGO/Favicon.png"
                 alt="Petcom"
                 fill
-                className="object-contain"
+                className="object-contain mix-blend-multiply"
                 priority
               />
             </div>

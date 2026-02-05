@@ -9,12 +9,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="relative w-[76px] h-[29px] md:w-[76px] md:h-[29px] scale-[2.1] origin-left mb-8">
+            <div className="relative w-48 h-20 mb-6">
               <Image
                 src="https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/LOGO/petcom.png"
                 alt="Petcom"
                 fill
                 className="object-contain object-left"
+                sizes="192px"
               />
             </div>
             <p className="text-gray-600 text-sm mb-4">
