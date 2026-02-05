@@ -67,8 +67,8 @@ export default async function HomePage() {
         
         {/* Content */}
         <div className="relative z-10 h-full max-w-[1200px] mx-auto px-4 flex flex-col items-center justify-center text-center">
-          {/* Logo grande */}
-          <div className="relative w-72 md:w-96 h-32 md:h-40 mb-8">
+          {/* Logo grande - 50% más grande */}
+          <div className="relative w-[430px] md:w-[576px] h-48 md:h-60 mb-8">
             <Image
               src="https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/LOGO/logo%20blanco.png"
               alt="Petcom"
@@ -105,15 +105,15 @@ export default async function HomePage() {
               <Link
                 key={category.slug}
                 href={`/catalogo?category=${category.slug}`}
-                className="group relative overflow-hidden rounded-2xl aspect-square shadow-md hover:shadow-xl transition-all duration-300"
+                className="group relative overflow-hidden rounded-2xl aspect-[3/4] shadow-md hover:shadow-xl transition-all duration-300"
               >
                 <Image
                   src={category.image}
                   alt={category.name}
                   fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="object-cover object-top group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   <h3 className="text-lg md:text-xl font-bold text-white">
                     {category.name}
@@ -197,9 +197,24 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-[#7baaf7] to-[#ba67c8]">
-        <div className="max-w-[1200px] mx-auto px-4 text-center">
+      {/* CTA Section with Video Background */}
+      <section className="relative py-24 overflow-hidden">
+        {/* Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="https://yxdamvwvnbkukcyzcemx.supabase.co/storage/v1/object/public/Hero_video/202602040234.mp4" type="video/mp4" />
+        </video>
+        
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#7baaf7]/90 to-[#ba67c8]/90" />
+        
+        {/* Content */}
+        <div className="relative z-10 max-w-[1200px] mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Tu mascota merece lo mejor
           </h2>

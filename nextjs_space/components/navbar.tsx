@@ -23,6 +23,7 @@ export function Navbar() {
       router.push(`/catalogo?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
       setSearchOpen(false);
+      setMobileMenuOpen(false);
     }
   };
 
@@ -43,41 +44,22 @@ export function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/catalogo" className="text-gray-600 hover:text-[#7baaf7] transition-colors font-medium">
-              Catálogo
-            </Link>
-            <Link href="/catalogo?category=perros" className="text-gray-600 hover:text-[#7baaf7] transition-colors font-medium">
-              Perros
-            </Link>
-            <Link href="/catalogo?category=gatos" className="text-gray-600 hover:text-[#7baaf7] transition-colors font-medium">
-              Gatos
-            </Link>
-            <Link href="/catalogo?category=mascotas-pequenas" className="text-gray-600 hover:text-[#7baaf7] transition-colors font-medium">
-              Mascotas Pequeñas
-            </Link>
-            <Link href="/catalogo?category=aves" className="text-gray-600 hover:text-[#7baaf7] transition-colors font-medium">
-              Aves
-            </Link>
-          </div>
+          {/* Search - Desktop (centrado) */}
+          <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-lg mx-8">
+            <div className="relative w-full">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="¿Qué estás buscando para tu mascota?"
+                className="w-full pl-12 pr-4 py-2.5 rounded-full bg-gray-100 border border-transparent focus:border-[#7baaf7] focus:bg-white focus:outline-none transition-all text-sm"
+              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            </div>
+          </form>
 
-          {/* Search & Actions */}
+          {/* Actions */}
           <div className="flex items-center gap-2">
-            {/* Desktop Search */}
-            <form onSubmit={handleSearch} className="hidden md:flex items-center">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Buscar productos..."
-                  className="w-48 lg:w-64 pl-10 pr-4 py-2 rounded-full bg-gray-100 border border-transparent focus:border-[#7baaf7] focus:bg-white focus:outline-none transition-all text-sm"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              </div>
-            </form>
-
             {/* Mobile Search Toggle */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
@@ -176,41 +158,6 @@ export function Navbar() {
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden border-t border-gray-100 py-4 space-y-2"
             >
-              <Link
-                href="/catalogo"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Catálogo
-              </Link>
-              <Link
-                href="/catalogo?category=perros"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Perros
-              </Link>
-              <Link
-                href="/catalogo?category=gatos"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Gatos
-              </Link>
-              <Link
-                href="/catalogo?category=mascotas-pequenas"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Mascotas Pequeñas
-              </Link>
-              <Link
-                href="/catalogo?category=aves"
-                className="block px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-700 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Aves
-              </Link>
               {session ? (
                 <>
                   <Link
