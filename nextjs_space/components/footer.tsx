@@ -6,51 +6,51 @@ export function Footer() {
   return (
     <footer className="bg-gradient-to-b from-[#F7F8FA] to-white border-t border-gray-200">
       {/* Main Footer Content */}
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6">
           
           {/* Logo & About - 4 cols */}
           <div className="lg:col-span-4 flex flex-col items-center lg:items-start">
             <Image
               src="/logo-petcom.png"
               alt="PETCOM - Everything for your pet"
-              width={220}
-              height={100}
-              className="object-contain mb-6"
+              width={180}
+              height={80}
+              className="object-contain mb-3"
               priority
             />
-            <p className="text-gray-600 text-center lg:text-left leading-relaxed mb-6">
-              Todo lo que tu mascota necesita, con la mejor calidad y los mejores precios. Más de 500 productos premium para consentir a tu mejor amigo.
+            <p className="text-gray-600 text-center lg:text-left leading-relaxed text-sm mb-4">
+              Todo lo que tu mascota necesita, con la mejor calidad y los mejores precios.
             </p>
             
             {/* Social Media */}
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <a
                 href="https://facebook.com/petcom"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-[#1877F2] hover:border-[#1877F2] hover:shadow-md transition-all"
+                className="w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-[#1877F2] hover:border-[#1877F2] transition-all"
                 aria-label="Facebook"
               >
-                <Facebook className="w-5 h-5" />
+                <Facebook className="w-4 h-4" />
               </a>
               <a
                 href="https://instagram.com/petcom"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-[#E4405F] hover:border-[#E4405F] hover:shadow-md transition-all"
+                className="w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-[#E4405F] hover:border-[#E4405F] transition-all"
                 aria-label="Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <Instagram className="w-4 h-4" />
               </a>
               <a
                 href="https://tiktok.com/@petcom"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-black hover:border-black hover:shadow-md transition-all"
+                className="w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-black hover:border-black transition-all"
                 aria-label="TikTok"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
                 </svg>
               </a>
@@ -58,12 +58,12 @@ export function Footer() {
           </div>
 
           {/* Links Sections - 8 cols */}
-          <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-6">
             
             {/* Tienda */}
             <div>
-              <h4 className="font-bold text-gray-900 mb-5 text-sm uppercase tracking-wide">Tienda</h4>
-              <ul className="space-y-3">
+              <h4 className="font-semibold text-gray-900 mb-3 text-xs uppercase tracking-wide">Tienda</h4>
+              <ul className="space-y-2">
                 <li>
                   <Link href="/catalogo" className="text-gray-600 hover:text-[#7baaf7] transition-colors text-sm">
                     Ver Catálogo
@@ -89,8 +89,8 @@ export function Footer() {
 
             {/* Ayuda */}
             <div>
-              <h4 className="font-bold text-gray-900 mb-5 text-sm uppercase tracking-wide">Ayuda</h4>
-              <ul className="space-y-3">
+              <h4 className="font-semibold text-gray-900 mb-3 text-xs uppercase tracking-wide">Ayuda</h4>
+              <ul className="space-y-2">
                 <li>
                   <Link href="/preguntas-frecuentes" className="text-gray-600 hover:text-[#7baaf7] transition-colors text-sm flex items-center gap-2">
                     <HelpCircle className="w-4 h-4" />
@@ -120,8 +120,8 @@ export function Footer() {
 
             {/* Legal */}
             <div>
-              <h4 className="font-bold text-gray-900 mb-5 text-sm uppercase tracking-wide">Legal</h4>
-              <ul className="space-y-3">
+              <h4 className="font-semibold text-gray-900 mb-3 text-xs uppercase tracking-wide">Legal</h4>
+              <ul className="space-y-2">
                 <li>
                   <Link href="/terminos-condiciones" className="text-gray-600 hover:text-[#7baaf7] transition-colors text-sm">
                     Términos y Condiciones
@@ -137,8 +137,8 @@ export function Footer() {
 
             {/* Contacto */}
             <div>
-              <h4 className="font-bold text-gray-900 mb-5 text-sm uppercase tracking-wide">Contacto</h4>
-              <ul className="space-y-3">
+              <h4 className="font-semibold text-gray-900 mb-3 text-xs uppercase tracking-wide">Contacto</h4>
+              <ul className="space-y-2">
                 <li>
                   <a href="mailto:hola@petcom.mx" className="text-gray-600 hover:text-[#7baaf7] transition-colors text-sm flex items-center gap-2">
                     <Mail className="w-4 h-4 flex-shrink-0" />
@@ -161,18 +161,18 @@ export function Footer() {
         </div>
 
         {/* Trust badges */}
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <div className="flex flex-wrap justify-center gap-6 md:gap-10 text-gray-500 text-sm">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#7baaf7]" />
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-gray-500 text-xs">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-[#7baaf7]" />
               <span>Pago 100% Seguro</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Truck className="w-5 h-5 text-[#7baaf7]" />
+            <div className="flex items-center gap-1.5">
+              <Truck className="w-4 h-4 text-[#7baaf7]" />
               <span>Envío gratis +$799</span>
             </div>
-            <div className="flex items-center gap-2">
-              <RefreshCw className="w-5 h-5 text-[#7baaf7]" />
+            <div className="flex items-center gap-1.5">
+              <RefreshCw className="w-4 h-4 text-[#7baaf7]" />
               <span>30 días de devolución</span>
             </div>
           </div>
@@ -180,13 +180,13 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="bg-gray-900 text-white py-4">
+      <div className="bg-gray-900 text-white py-3">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-sm">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-1 text-xs">
             <p className="text-gray-400">
               © 2026 PETCOM. Todos los derechos reservados.
             </p>
-            <p className="text-gray-500 text-xs flex items-center gap-1">
+            <p className="text-gray-500 flex items-center gap-1">
               Hecho con <Heart className="w-3 h-3 text-[#e67c73] fill-[#e67c73]" /> para tu mascota
             </p>
           </div>
