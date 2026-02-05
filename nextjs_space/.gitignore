@@ -47,8 +47,15 @@ prisma/*.db-journal
 
 # TypeScript
 *.tsbuildinfo
+next-env.d.ts
 
 # Abacus
 .abacus.donotdelete
-.deploy/
-.logs/
+
+# Yarn
+.yarn/
+install-state.gz
+
+# Yarn
+.yarn/
+install-state.gz
