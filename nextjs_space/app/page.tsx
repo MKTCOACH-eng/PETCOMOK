@@ -456,15 +456,15 @@ export default async function HomePage() {
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                <h3 className="text-2xl font-bold mb-2">Conecta con los mejores profesionales</h3>
-                <p className="text-white/90 mb-4">Veterinarios, estéticas, entrenadores, paseadores y más</p>
+                <h3 className="text-2xl font-bold mb-2">¿Eres prestador de servicios para mascotas?</h3>
+                <p className="text-white/90 mb-4">Forma parte de la comunidad PETCOM y ofrece tus servicios a miles de dueños de mascotas</p>
                 <Link
-                  href="/servicios"
+                  href="/proveedor/registro"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#7baaf7] rounded-lg font-semibold hover:bg-gray-100 transition-colors"
                 >
-                  Ver todos los servicios
+                  Únete como proveedor
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>
