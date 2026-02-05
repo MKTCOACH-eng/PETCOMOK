@@ -12,7 +12,9 @@ import {
   LogOut,
   Menu,
   X,
-  Home
+  Home,
+  Users,
+  Ticket
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
@@ -21,8 +23,9 @@ const navigation = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Productos', href: '/admin/productos', icon: Package },
   { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
+  { name: 'Clientes', href: '/admin/clientes', icon: Users },
   { name: 'Categorías', href: '/admin/categorias', icon: Tag },
-  { name: 'Cupones', href: '/admin/cupones', icon: Tag },
+  { name: 'Cupones', href: '/admin/cupones', icon: Ticket },
   { name: 'Proveedores', href: '/admin/proveedores', icon: Truck },
 ];
 

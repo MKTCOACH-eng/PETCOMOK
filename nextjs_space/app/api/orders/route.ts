@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import prisma from '@/lib/db';
+import { sendEmail, generateOrderConfirmationEmail, generateAdminOrderNotificationEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,6 +91,45 @@ export async function POST(request: NextRequest) {
         where: { id: item.productId },
         data: { stock: { decrement: item.quantity } },
       });
+    }
+
+    // Get user info for email
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const customerName = user?.name || shippingData?.name || 'Cliente';
+    const customerEmail = shippingData?.email || user?.email || '';
+
+    // Send order confirmation email to customer
+    if (customerEmail) {
+      const orderDetails = {
+        orderId: order.id,
+        customerName,
+        items: order.items.map(item => ({
+          name: item.product.name,
+          quantity: item.quantity,
+          price: item.price,
+          imageUrl: item.product.imageUrl,
+        })),
+        subtotal: order.subtotal,
+        discount: order.discount,
+        total: order.total,
+        shippingAddress: order.shippingAddress || undefined,
+      };
+
+      // Send to customer
+      sendEmail({
+        to: customerEmail,
+        subject: `¡Pedido confirmado! #${order.id.slice(-8).toUpperCase()}`,
+        body: generateOrderConfirmationEmail(orderDetails),
+        notificationId: process.env.NOTIF_ID_CONFIRMACIN_DE_PEDIDO || '',
+      }).catch(err => console.error('Email to customer failed:', err));
+
+      // Send admin notification
+      sendEmail({
+        to: 'lourdes@mktcoach.com.mx',
+        subject: `Nuevo pedido #${order.id.slice(-8).toUpperCase()} - $${order.total.toLocaleString('es-MX')}`,
+        body: generateAdminOrderNotificationEmail({ ...orderDetails, customerEmail }),
+        notificationId: process.env.NOTIF_ID_NUEVO_PEDIDO_ADMIN || '',
+      }).catch(err => console.error('Email to admin failed:', err));
     }
 
     return NextResponse.json(order, { status: 201 });

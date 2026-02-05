@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/db';
+import { sendEmail, generateWelcomeEmail } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +40,15 @@ export async function POST(request: NextRequest) {
 
     // Store password separately (in production, add password field to User model)
     await prisma.$executeRaw`UPDATE users SET password = ${hashedPassword} WHERE id = ${user.id}`;
+
+    // Send welcome email
+    const userName = user.name || email.split('@')[0];
+    sendEmail({
+      to: email,
+      subject: `¡Bienvenido a PETCOM, ${userName}! 🐾`,
+      body: generateWelcomeEmail(userName),
+      notificationId: process.env.NOTIF_ID_EMAIL_DE_BIENVENIDA || '',
+    }).catch(err => console.error('Welcome email failed:', err));
 
     return NextResponse.json(
       { message: 'Usuario creado exitosamente', user: { id: user.id, email: user.email, name: user.name } },
