@@ -146,6 +146,185 @@ const products = [
   }
 ];
 
+const articles = [
+  {
+    title: '5 Señales de que tu perro necesita más ejercicio',
+    slug: '5-senales-perro-necesita-ejercicio',
+    content: `¿Tu perro está inquieto o destruye cosas en casa? Podría necesitar más actividad física.
+
+## Las 5 señales principales:
+
+1. **Comportamiento destructivo** - Morder muebles, zapatos o ropa
+2. **Ladridos excesivos** - Especialmente cuando está solo
+3. **Hiperactividad en casa** - Corre en círculos constantemente
+4. **Aumento de peso** - Falta de actividad = sobrepeso
+5. **Dificultad para dormir** - Energía acumulada
+
+## ¿Cuánto ejercicio necesita tu perro?
+
+La cantidad depende de la raza y edad:
+- **Razas pequeñas**: 30-60 minutos diarios
+- **Razas medianas**: 60-90 minutos diarios
+- **Razas grandes/activas**: 90-120 minutos diarios
+
+Recuerda siempre adaptar el ejercicio a las capacidades de tu mascota y consultar con tu veterinario.`,
+    excerpt: 'Descubre las señales que indican que tu perro necesita más actividad física y cómo ayudarlo.',
+    imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800',
+    contentType: 'article',
+    category: 'health',
+    petType: 'perro',
+    featured: true,
+    published: true,
+    tags: ['ejercicio', 'salud', 'perros', 'comportamiento'],
+  },
+  {
+    title: 'Cómo bañar a tu gato sin estrés',
+    slug: 'como-banar-gato-sin-estres',
+    content: `Los gatos generalmente se bañan solos, pero a veces necesitan nuestra ayuda. Aquí te explicamos cómo hacerlo.
+
+## Preparación antes del baño:
+
+1. Cepilla bien a tu gato para eliminar nudos
+2. Prepara todo lo que necesitas antes de comenzar
+3. Usa agua tibia, nunca fría ni muy caliente
+4. Elige un shampoo especial para gatos
+
+## Durante el baño:
+
+- Habla con voz calmada y tranquila
+- Moja gradualmente, empezando por las patas
+- Evita mojar la cabeza directamente
+- Enjuaga muy bien para eliminar todo el jabón
+
+## Después del baño:
+
+Seca a tu gato con una toalla suave y mantenlo en un lugar cálido hasta que esté completamente seco.`,
+    excerpt: 'Guía paso a paso para bañar a tu gato de manera tranquila y efectiva.',
+    imageUrl: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800',
+    contentType: 'tip',
+    category: 'grooming',
+    petType: 'gato',
+    featured: true,
+    published: true,
+    tags: ['baño', 'grooming', 'gatos', 'cuidado'],
+  },
+  {
+    title: 'Los mejores alimentos para perros senior',
+    slug: 'mejores-alimentos-perros-senior',
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoDuration: '8:45',
+    content: `Cuando tu perro envejece, sus necesidades nutricionales cambian. En este video te explicamos qué buscar en un alimento para perros mayores.
+
+## Características importantes:
+
+- **Proteína de alta calidad** para mantener masa muscular
+- **Menos calorías** para evitar el sobrepeso
+- **Glucosamina y condroitina** para las articulaciones
+- **Omega-3** para la piel y el pelaje
+- **Antioxidantes** para el sistema inmune
+
+Consulta siempre con tu veterinario antes de cambiar la dieta de tu mascota.`,
+    excerpt: 'Video guía sobre la nutrición adecuada para perros mayores de 7 años.',
+    imageUrl: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800',
+    contentType: 'video',
+    category: 'nutrition',
+    petType: 'perro',
+    featured: false,
+    published: true,
+    tags: ['nutrición', 'senior', 'perros', 'alimento'],
+  },
+  {
+    title: 'Juguetes DIY para gatos: 5 ideas fáciles',
+    slug: 'juguetes-diy-gatos-ideas-faciles',
+    content: `¡No necesitas gastar mucho para entretener a tu gato! Aquí te compartimos 5 juguetes caseros.
+
+## 1. La caja de cartón mágica
+Corta agujeros de diferentes tamaños en una caja y esconde premios dentro.
+
+## 2. Caña de pescar con plumas
+Usa un palo, cuerda y plumas para crear horas de diversión.
+
+## 3. Pelota de calcetín
+Rellena un calcetín viejo con hierba gatera y ánudalo.
+
+## 4. Túnel de bolsas de papel
+Conecta varias bolsas de papel para crear un túnel de exploración.
+
+## 5. Rompecabezas con tubos
+Usa tubos de papel higiénico pegados para esconder premios.
+
+¡Tu gato te lo agradecerá!`,
+    excerpt: '5 juguetes caseros que puedes hacer con materiales que ya tienes en casa.',
+    imageUrl: 'https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=800',
+    contentType: 'tip',
+    category: 'tips',
+    petType: 'gato',
+    featured: true,
+    published: true,
+    tags: ['DIY', 'juguetes', 'gatos', 'manualidades'],
+  },
+  {
+    title: 'Guía completa de vacunación para cachorros',
+    slug: 'guia-vacunacion-cachorros',
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoDuration: '12:30',
+    content: `Las vacunas son esenciales para proteger la salud de tu cachorro. Te explicamos todo lo que necesitas saber.
+
+## Calendario de vacunación:
+
+**6-8 semanas**: Primera dosis de parvovirus y moquillo
+**10-12 semanas**: Segunda dosis + hepatitis y parainfluenza  
+**14-16 semanas**: Tercera dosis + rabia
+**Anualmente**: Refuerzos según indicación veterinaria
+
+## Cuidados post-vacunación:
+
+- Mantén a tu cachorro en reposo 24-48 horas
+- Es normal algo de somnolencia
+- Evita el contacto con otros perros hasta completar el esquema`,
+    excerpt: 'Todo sobre el calendario de vacunas para proteger la salud de tu cachorro.',
+    imageUrl: 'https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=800',
+    contentType: 'video',
+    category: 'health',
+    petType: 'perro',
+    featured: false,
+    published: true,
+    tags: ['vacunas', 'cachorros', 'salud', 'veterinario'],
+  },
+  {
+    title: 'Cómo elegir la jaula perfecta para tu hámster',
+    slug: 'elegir-jaula-perfecta-hamster',
+    content: `Una jaula adecuada es fundamental para el bienestar de tu hámster. Aquí te explicamos qué considerar.
+
+## Tamaño mínimo recomendado:
+
+- **Hámster sirio**: 80x50 cm de base mínimo
+- **Hámster enano**: 60x40 cm de base mínimo
+
+## Características importantes:
+
+1. **Barrotes horizontales** para que pueda trepar
+2. **Espacio entre barrotes** máximo 1 cm para hámsters enanos
+3. **Base profunda** (al menos 10 cm) para el sustrato
+4. **Buena ventilación** pero sin corrientes de aire
+
+## Accesorios imprescindibles:
+
+- Rueda de ejercicio (diámetro mínimo 20 cm)
+- Casita o refugio
+- Bebedero de boquilla
+- Comedero pesado (que no vuelque)`,
+    excerpt: 'Guía completa para elegir el hogar perfecto para tu pequeño roedor.',
+    imageUrl: 'https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=800',
+    contentType: 'article',
+    category: 'tips',
+    petType: 'all',
+    featured: false,
+    published: true,
+    tags: ['hámster', 'jaula', 'mascotas pequeñas', 'cuidados'],
+  },
+];
+
 async function main() {
   console.log('🌱 Starting seed...');
 
@@ -156,6 +335,7 @@ async function main() {
   await prisma.category.deleteMany();
   await prisma.userPreferences.deleteMany();
   await prisma.pet.deleteMany();
+  await prisma.article.deleteMany();
   await prisma.user.deleteMany();
 
   console.log('🧹 Cleaned existing data');
@@ -191,6 +371,14 @@ async function main() {
     },
   });
   console.log('👤 Created test admin user: test@petcom.com / petcom123');
+
+  // Create articles
+  for (const article of articles) {
+    await prisma.article.create({
+      data: article,
+    });
+    console.log(`📝 Created article: ${article.title}`);
+  }
 
   console.log('✅ Seed completed successfully!');
 }
