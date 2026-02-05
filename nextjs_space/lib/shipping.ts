@@ -667,10 +667,12 @@ export const DEFAULT_PACKAGE: PackageInfo = {
 // Origin address (PETCOM warehouse)
 export const PETCOM_ORIGIN: ShippingAddress = {
   name: 'PETCOM MX',
-  street: 'Av. Insurgentes Sur 1234, Col. Del Valle',
-  city: 'Ciudad de México',
-  state: 'CDMX',
-  zipCode: '03100',
-  phone: '5555551234',
+  street: 'Arquitectura 3',
+  street2: 'Lomas Anáhuac',
+  city: 'Huixquilucan',
+  state: 'MEX', // Estado de México
+  zipCode: '52786',
+  country: 'MX',
+  phone: '5555551234', // Actualizar con tu teléfono real
   email: 'envios@petcom.mx',
 };
