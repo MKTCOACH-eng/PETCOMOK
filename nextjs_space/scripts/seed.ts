@@ -496,6 +496,177 @@ async function main() {
     }
   }
 
+  // ========================================
+  // LOYALTY PROGRAM DATA
+  // ========================================
+  console.log('🎖️ Seeding loyalty program...');
+
+  // Loyalty Settings
+  const existingSettings = await prisma.loyaltySettings.findFirst();
+  if (!existingSettings) {
+    await prisma.loyaltySettings.create({
+      data: {
+        pointsPerPeso: 1,
+        minPurchaseForPoints: 100,
+        pointsExpirationDays: 365,
+        signupBonus: 100,
+        firstPurchaseBonus: 200,
+        reviewBonus: 50,
+        referralBonus: 300,
+        birthdayBonus: 100,
+        isActive: true,
+      },
+    });
+    console.log('⚙️ Created loyalty settings');
+  }
+
+  // Loyalty Tiers
+  const loyaltyTiers = [
+    {
+      name: 'Bronce',
+      slug: 'bronce',
+      minPoints: 0,
+      minSpent: 0,
+      pointsMultiplier: 1,
+      discountPercent: 0,
+      freeShipping: false,
+      prioritySupport: false,
+      earlyAccess: false,
+      birthdayBonus: 50,
+      color: '#CD7F32',
+      sortOrder: 0,
+    },
+    {
+      name: 'Plata',
+      slug: 'plata',
+      minPoints: 1000,
+      minSpent: 2000,
+      pointsMultiplier: 1.25,
+      discountPercent: 5,
+      freeShipping: false,
+      prioritySupport: false,
+      earlyAccess: false,
+      birthdayBonus: 100,
+      color: '#C0C0C0',
+      sortOrder: 1,
+    },
+    {
+      name: 'Oro',
+      slug: 'oro',
+      minPoints: 5000,
+      minSpent: 10000,
+      pointsMultiplier: 1.5,
+      discountPercent: 10,
+      freeShipping: true,
+      prioritySupport: true,
+      earlyAccess: false,
+      birthdayBonus: 200,
+      color: '#FFD700',
+      sortOrder: 2,
+    },
+    {
+      name: 'Platino',
+      slug: 'platino',
+      minPoints: 15000,
+      minSpent: 30000,
+      pointsMultiplier: 2,
+      discountPercent: 15,
+      freeShipping: true,
+      prioritySupport: true,
+      earlyAccess: true,
+      birthdayBonus: 500,
+      color: '#E5E4E2',
+      sortOrder: 3,
+    },
+  ];
+
+  for (const tier of loyaltyTiers) {
+    const existing = await prisma.loyaltyTier.findFirst({ where: { slug: tier.slug } });
+    if (!existing) {
+      await prisma.loyaltyTier.create({ data: tier });
+      console.log(`⭐ Created tier: ${tier.name}`);
+    }
+  }
+
+  // Loyalty Rewards
+  const loyaltyRewards = [
+    {
+      name: '$50 de descuento',
+      description: 'Obtén $50 MXN de descuento en tu próxima compra.',
+      type: 'DISCOUNT_FIXED',
+      pointsCost: 500,
+      value: 50,
+      minPurchase: 300,
+      validDays: 30,
+      isActive: true,
+      isFeatured: false,
+    },
+    {
+      name: '10% de descuento',
+      description: 'Obtén 10% de descuento en tu próxima compra.',
+      type: 'DISCOUNT_PERCENT',
+      pointsCost: 800,
+      value: 10,
+      maxDiscount: 200,
+      minPurchase: 500,
+      validDays: 30,
+      isActive: true,
+      isFeatured: true,
+    },
+    {
+      name: '$100 de descuento',
+      description: 'Obtén $100 MXN de descuento en tu próxima compra.',
+      type: 'DISCOUNT_FIXED',
+      pointsCost: 1000,
+      value: 100,
+      minPurchase: 500,
+      validDays: 30,
+      isActive: true,
+      isFeatured: false,
+    },
+    {
+      name: 'Envío Gratis',
+      description: 'Envío gratis en tu próxima compra sin mínimo de compra.',
+      type: 'FREE_SHIPPING',
+      pointsCost: 600,
+      value: 150,
+      validDays: 30,
+      isActive: true,
+      isFeatured: true,
+    },
+    {
+      name: '20% de descuento',
+      description: 'Obtén 20% de descuento en tu próxima compra. ¡Exclusivo!',
+      type: 'DISCOUNT_PERCENT',
+      pointsCost: 1500,
+      value: 20,
+      maxDiscount: 500,
+      minPurchase: 800,
+      validDays: 30,
+      isActive: true,
+      isFeatured: true,
+    },
+    {
+      name: '$200 de descuento',
+      description: 'Obtén $200 MXN de descuento. Ideal para compras grandes.',
+      type: 'DISCOUNT_FIXED',
+      pointsCost: 2000,
+      value: 200,
+      minPurchase: 1000,
+      validDays: 45,
+      isActive: true,
+      isFeatured: false,
+    },
+  ];
+
+  for (const reward of loyaltyRewards) {
+    const existing = await prisma.loyaltyReward.findFirst({ where: { name: reward.name } });
+    if (!existing) {
+      await prisma.loyaltyReward.create({ data: reward });
+      console.log(`🎁 Created reward: ${reward.name}`);
+    }
+  }
+
   console.log('✅ Seed completed successfully!');
 }
 

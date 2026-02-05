@@ -524,3 +524,170 @@ model ServiceReview {
   @@index([isApproved])
   @@index([rating])
 }
+
+// ========================================
+// SISTEMA DE LEALTAD Y PUNTOS
+// ========================================
+
+model LoyaltyAccount {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  
+  // Balance
+  totalPoints     Int      @default(0)  // Puntos acumulados totales históricos
+  currentPoints   Int      @default(0)  // Puntos disponibles para canjear
+  
+  // Nivel
+  tierId          String?
+  tierUpdatedAt   DateTime?
+  
+  // Estadísticas
+  totalSpent      Float    @default(0)  // Total gastado histórico
+  totalOrders     Int      @default(0)  // Total de pedidos
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tier         LoyaltyTier?        @relation(fields: [tierId], references: [id])
+  transactions PointsTransaction[]
+
+  @@map("loyalty_accounts")
+  @@index([tierId])
+}
+
+model LoyaltyTier {
+  id              String   @id @default(cuid())
+  name            String   @unique  // Bronce, Plata, Oro, Platino
+  slug            String   @unique
+  
+  // Requisitos
+  minPoints       Int      @default(0)     // Puntos mínimos para alcanzar
+  minSpent        Float    @default(0)     // Gasto mínimo para alcanzar
+  
+  // Beneficios
+  pointsMultiplier Float   @default(1)     // Multiplicador de puntos (1.5x, 2x, etc)
+  discountPercent  Float   @default(0)     // Descuento permanente en compras
+  freeShipping     Boolean @default(false) // Envío gratis
+  prioritySupport  Boolean @default(false) // Soporte prioritario
+  earlyAccess      Boolean @default(false) // Acceso anticipado a ofertas
+  birthdayBonus    Int     @default(0)     // Puntos extra en cumpleaños
+  
+  // Visual
+  color           String   @default("#7baaf7")
+  icon            String?
+  
+  // Orden
+  sortOrder       Int      @default(0)
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  accounts LoyaltyAccount[]
+
+  @@map("loyalty_tiers")
+  @@index([sortOrder])
+}
+
+model PointsTransaction {
+  id              String   @id @default(cuid())
+  accountId       String
+  
+  // Transacción
+  type            String   // EARNED, REDEEMED, EXPIRED, ADJUSTMENT, BONUS, REFERRAL
+  points          Int      // Positivo = ganados, Negativo = usados/expirados
+  
+  // Contexto
+  description     String
+  orderId         String?  // Si aplica
+  rewardId        String?  // Si canjeó una recompensa
+  
+  // Balance después de esta transacción
+  balanceAfter    Int
+  
+  // Expiración (para puntos ganados)
+  expiresAt       DateTime?
+  isExpired       Boolean  @default(false)
+  
+  createdAt       DateTime @default(now())
+
+  account LoyaltyAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  reward  LoyaltyReward? @relation(fields: [rewardId], references: [id])
+
+  @@map("points_transactions")
+  @@index([accountId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([expiresAt])
+}
+
+model LoyaltyReward {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @db.Text
+  
+  // Tipo de recompensa
+  type            String   // DISCOUNT_PERCENT, DISCOUNT_FIXED, FREE_SHIPPING, FREE_PRODUCT, GIFT_CARD
+  
+  // Costo en puntos
+  pointsCost      Int
+  
+  // Valor de la recompensa
+  value           Float    // Porcentaje de descuento o monto fijo
+  productId       String?  // Si es producto gratis
+  
+  // Restricciones
+  minPurchase     Float?   // Compra mínima para usar
+  maxDiscount     Float?   // Descuento máximo (para porcentaje)
+  validDays       Int      @default(30)  // Días de validez después de canjear
+  
+  // Límites
+  maxRedemptions  Int?     // Límite total de canjes
+  timesRedeemed   Int      @default(0)
+  
+  // Visual
+  imageUrl        String?
+  
+  // Control
+  isActive        Boolean  @default(true)
+  isFeatured      Boolean  @default(false)
+  
+  // Restricción por nivel
+  minTierId       String?  // Nivel mínimo requerido
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transactions PointsTransaction[]
+
+  @@map("loyalty_rewards")
+  @@index([type])
+  @@index([isActive])
+  @@index([pointsCost])
+}
+
+model LoyaltySettings {
+  id                    String   @id @default(cuid())
+  
+  // Configuración de puntos
+  pointsPerPeso         Float    @default(1)    // Puntos por cada peso gastado
+  minPurchaseForPoints  Float    @default(100)  // Compra mínima para ganar puntos
+  
+  // Expiración
+  pointsExpirationDays  Int      @default(365)  // Días hasta que expiren los puntos
+  
+  // Bonos
+  signupBonus           Int      @default(100)  // Puntos por registro
+  firstPurchaseBonus    Int      @default(200)  // Puntos extra en primera compra
+  reviewBonus           Int      @default(50)   // Puntos por escribir reseña
+  referralBonus         Int      @default(300)  // Puntos por referir amigo
+  birthdayBonus         Int      @default(100)  // Puntos en cumpleaños
+  
+  // Control
+  isActive              Boolean  @default(true)
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("loyalty_settings")
+}

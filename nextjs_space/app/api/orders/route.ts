@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-options';
 import prisma from '@/lib/db';
 import { sendEmail, generateOrderConfirmationEmail, generateAdminOrderNotificationEmail } from '@/lib/email';
+import { awardPointsForPurchase } from '@/lib/loyalty';
 
 export const dynamic = 'force-dynamic';
 
@@ -99,6 +100,23 @@ export async function POST(request: NextRequest) {
         where: { id: item.productId },
         data: { stock: { decrement: item.quantity } },
       });
+    }
+
+    // Award loyalty points
+    try {
+      // Check if this is first purchase
+      const previousOrders = await prisma.order.count({
+        where: { userId, id: { not: order.id } },
+      });
+      const isFirstPurchase = previousOrders === 0;
+      
+      const loyaltyResult = await awardPointsForPurchase(userId, order.id, subtotal, isFirstPurchase);
+      if (loyaltyResult) {
+        console.log(`Awarded ${loyaltyResult.currentPoints} points to user ${userId} for order ${order.id}`);
+      }
+    } catch (loyaltyError) {
+      console.error('Error awarding loyalty points:', loyaltyError);
+      // Don't fail the order if loyalty points fail
     }
 
     // Get user info for email

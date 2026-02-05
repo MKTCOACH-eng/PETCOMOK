@@ -18,7 +18,8 @@ import {
   Megaphone,
   FileText,
   Globe,
-  Stethoscope
+  Stethoscope,
+  Award
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
@@ -31,6 +32,7 @@ const navigation = [
   { name: 'Envíos', href: '/admin/envios', icon: Truck },
   { name: 'Servicios', href: '/admin/servicios', icon: Stethoscope },
   { name: 'Clientes', href: '/admin/clientes', icon: Users },
+  { name: 'Lealtad', href: '/admin/lealtad', icon: Award },
   { name: 'Blog & Tips', href: '/admin/contenido', icon: FileText },
   { name: 'Marketing', href: '/admin/marketing', icon: Megaphone },
   { name: 'Categorías', href: '/admin/categorias', icon: Tag },
