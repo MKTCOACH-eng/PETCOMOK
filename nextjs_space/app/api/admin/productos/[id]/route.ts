@@ -29,12 +29,27 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         name: data.name,
         description: data.description,
         price: data.price,
+        compareAtPrice: data.compareAtPrice,
+        costPrice: data.costPrice,
         imageUrl: data.imageUrl,
+        images: data.images || [],
         categoryId: data.categoryId,
         petTypes: data.petTypes || [],
         stock: data.stock || 0,
+        sku: data.sku || null,
+        barcode: data.barcode || null,
+        weight: data.weight,
         featured: data.featured || false,
+        isActive: data.isActive ?? true,
         tags: data.tags || [],
+        taxRate: data.taxRate || 16,
+        taxIncluded: data.taxIncluded ?? true,
+        supplierId: data.supplierId,
+        supplierSku: data.supplierSku || null,
+        supplierPrice: data.supplierPrice,
+        supplierUrl: data.supplierUrl || null,
+        marginPercent: data.marginPercent,
+        autoSync: data.autoSync || false,
       },
     });
 
@@ -51,7 +66,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Check if product has orders
     const orderItems = await prisma.orderItem.count({
       where: { productId: params.id },
     });

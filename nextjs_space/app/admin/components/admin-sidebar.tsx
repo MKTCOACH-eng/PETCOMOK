@@ -8,8 +8,7 @@ import {
   Package, 
   ShoppingCart, 
   Tag, 
-  Users, 
-  Settings,
+  Truck, 
   LogOut,
   Menu,
   X,
@@ -24,6 +23,7 @@ const navigation = [
   { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
   { name: 'Categorías', href: '/admin/categorias', icon: Tag },
   { name: 'Cupones', href: '/admin/cupones', icon: Tag },
+  { name: 'Proveedores', href: '/admin/proveedores', icon: Truck },
 ];
 
 export function AdminSidebar() {

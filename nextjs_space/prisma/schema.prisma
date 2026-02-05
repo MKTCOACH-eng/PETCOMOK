@@ -62,22 +62,61 @@ model Product {
   name                 String
   description          String   @db.Text
   price                Float
+  compareAtPrice       Float?   // Precio tachado (antes)
+  costPrice            Float?   // Costo del producto (dropshipping)
   imageUrl             String
+  images               String[] @default([])
   categoryId           String
   petTypes             String[]
   stock                Int      @default(0)
+  sku                  String?  @unique
+  barcode              String?
+  weight               Float?   // En gramos
   featured             Boolean  @default(false)
+  isActive             Boolean  @default(true)
   tags                 String[] @default([])
+  taxRate              Float    @default(16) // IVA México 16%
+  taxIncluded          Boolean  @default(true)
+  
+  // Dropshipping fields
+  supplierId           String?
+  supplierSku          String?
+  supplierPrice        Float?
+  supplierUrl          String?
+  marginPercent        Float?
+  autoSync             Boolean  @default(false)
+  
   recommendationReason String?  @db.Text
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
   category   Category    @relation(fields: [categoryId], references: [id])
   orderItems OrderItem[]
+  supplier   Supplier?   @relation(fields: [supplierId], references: [id])
 
   @@map("products")
   @@index([categoryId])
   @@index([featured])
+  @@index([sku])
+  @@index([supplierId])
+}
+
+model Supplier {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  website     String?
+  apiKey      String?
+  apiUrl      String?
+  notes       String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@map("suppliers")
 }
 
 model Order {
