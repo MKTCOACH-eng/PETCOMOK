@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
-import { ShoppingCart, User, Menu, X, LogOut, Package, Search, PawPrint } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, LogOut, Package, Search, PawPrint, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -45,7 +45,7 @@ export function Navbar() {
           </Link>
 
           {/* Search - Desktop (centrado) */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-lg mx-8">
+          <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-md mx-6">
             <div className="relative w-full">
               <input
                 type="text"
@@ -57,6 +57,15 @@ export function Navbar() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             </div>
           </form>
+
+          {/* Blog Link - Desktop */}
+          <Link
+            href="/blog"
+            className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors text-sm font-medium"
+          >
+            <BookOpen className="w-4 h-4" />
+            Blog & Tips
+          </Link>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
@@ -165,6 +174,16 @@ export function Navbar() {
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden border-t border-gray-100 py-4 space-y-2"
             >
+              {/* Blog link for everyone */}
+              <Link
+                href="/blog"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 text-[#7baaf7] font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <BookOpen className="w-5 h-5" />
+                Blog & Tips
+              </Link>
+              
               {session ? (
                 <>
                   <Link

@@ -183,14 +183,32 @@ model Article {
   content         String   @db.Text
   imageUrl        String?
   author          String?
+  
+  // Content type: article, video, tip
+  contentType     String   @default("article")
+  
+  // Video fields
+  videoUrl        String?  // YouTube, Vimeo, etc.
+  videoDuration   String?  // "5:30" format
+  
+  // Categorization
+  category        String   @default("general") // tips, nutrition, health, grooming, training
+  petType         String?  // perro, gato, all
+  tags            String[] @default([])
+  
   relatedProducts String[] @default([])
+  featured        Boolean  @default(false)
   published       Boolean  @default(false)
+  viewCount       Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   @@map("articles")
   @@index([slug])
   @@index([published])
+  @@index([contentType])
+  @@index([category])
+  @@index([featured])
 }
 
 model UserPreferences {

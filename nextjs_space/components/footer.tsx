@@ -133,10 +133,10 @@ export function Footer() {
           <div>
             <h4 className="font-semibold text-gray-900 mb-3 text-xs uppercase tracking-wide">Ayuda</h4>
             <ul className="space-y-1.5">
+              <li><Link href="/blog" className="text-gray-600 hover:text-[#7baaf7] text-sm">Blog & Tips</Link></li>
               <li><Link href="/preguntas-frecuentes" className="text-gray-600 hover:text-[#7baaf7] text-sm">FAQ</Link></li>
               <li><Link href="/politica-envios" className="text-gray-600 hover:text-[#7baaf7] text-sm">Envíos</Link></li>
               <li><Link href="/devoluciones" className="text-gray-600 hover:text-[#7baaf7] text-sm">Devoluciones</Link></li>
-              <li><Link href="/mis-mascotas" className="text-gray-600 hover:text-[#7baaf7] text-sm">Mis Mascotas</Link></li>
             </ul>
           </div>
 

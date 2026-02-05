@@ -15,7 +15,8 @@ import {
   Home,
   Users,
   Ticket,
-  Megaphone
+  Megaphone,
+  FileText
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
@@ -25,6 +26,7 @@ const navigation = [
   { name: 'Productos', href: '/admin/productos', icon: Package },
   { name: 'Pedidos', href: '/admin/pedidos', icon: ShoppingCart },
   { name: 'Clientes', href: '/admin/clientes', icon: Users },
+  { name: 'Blog & Tips', href: '/admin/contenido', icon: FileText },
   { name: 'Marketing', href: '/admin/marketing', icon: Megaphone },
   { name: 'Categorías', href: '/admin/categorias', icon: Tag },
   { name: 'Cupones', href: '/admin/cupones', icon: Ticket },
